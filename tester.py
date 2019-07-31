@@ -34,6 +34,14 @@ def read_voltage(batt_id, batt_infos, mcp):
     pin1 = batt_infos[batt_id]["mcp_pin1"]
     return AnalogIn(mcp, pin0, pin1).voltage
 
+def read_all_voltages_t(batt_infos, mcp):
+    for batt_id in list(batt_infos.keys()):
+        close_relay(batt_id, batt_infos)
+        time.sleep(0.1)
+        voltage = read_voltage(batt_id, batt_infos, mcp)
+        open_relay(batt_id, batt_infos)
+        print('Voltage batt ' + str(batt_id) + ": " + str(voltage) + 'V')
+
 batt_infos = {
     1: {"relay_gpio":5, "mcp_pin0": MCP.P0, "mcp_pin1": MCP.P1},
     2: {"relay_gpio":6, "mcp_pin0": MCP.P2, "mcp_pin1": MCP.P3},
@@ -41,19 +49,39 @@ batt_infos = {
     4: {"relay_gpio":19, "mcp_pin0": MCP.P6, "mcp_pin1": MCP.P7}
 }
 
-# ==== measure the voltage ====
-
-# MCP3008 hardware SPI configuration
+# ==== MCP3008 hardware SPI configuration ====
 spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
 # create the cs (chip select)
 cs = digitalio.DigitalInOut(board.CE0)
 # create the mcp object (harware option)
 mcp = MCP.MCP3008(spi, cs)
 
+
+# ==== beginning of the capacity measure ====
+
+# close all the relays
+batt_measures = {}
 for batt_id in list(batt_infos.keys()):
     close_relay(batt_id, batt_infos)
-    time.sleep(0.1)
-    voltage = read_voltage(batt_id, batt_infos, mcp)
-    open_relay(batt_id, batt_infos)
-    print('Voltage batt ' + str(batt_id) + ": " + str(voltage) + 'V')
+    time.sleep(0.5)
+    # initialize the dictionnary that records the measures
+    batt_measures[batt_id] = {'voltages': [], 'capacity': 0}
 
+i = 0
+while i < 3:
+    for batt_id in list(batt_infos.keys()):
+        voltage = read_voltage(batt_id, batt_infos, mcp)
+        batt_measures[batt_id]['voltages'].append(voltage)
+        print('batt ' + str(batt_id) + ": " + str(voltage))
+    time.sleep(1)
+    i += 1
+print(batt_measures)
+
+# for each battery
+# while the voltage > 3V, record the voltages
+# when voltage < 3V, open the relay of this battery, and send the total capacity
+
+# open all the relays
+for batt_id in list(batt_infos.keys()):
+    open_relay(batt_id, batt_infos)
+    time.sleep(0.5)
