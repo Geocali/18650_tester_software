@@ -15,22 +15,20 @@ GPIO.setup(RELAIS_1_GPIO, GPIO.OUT)
 GPIO.output(RELAIS_1_GPIO, GPIO.LOW)
 
 # ==== measure the voltage ====
-# create the spi bus
+
+# hardware SPI configuration
 spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
-
 # create the cs (chip select)
-cs = digitalio.DigitalInOut(board.D5)
-
-# create the mcp object
+cs = digitalio.DigitalInOut(board.CE0)
+# create the mcp object (harware option)
 mcp = MCP.MCP3008(spi, cs)
 
 # create a differential ADC channel between Pin 0 and Pin 1
 chan = AnalogIn(mcp, MCP.P0, MCP.P1)
 
-print('Differential ADC Value: ', chan.value)
 print('Differential ADC Voltage: ' + str(chan.voltage) + 'V')
 
 
 
 # ==== open the relay ====
-#GPIO.output(RELAIS_1_GPIO, GPIO.HIGH) # open the relay
+GPIO.output(RELAIS_1_GPIO, GPIO.HIGH) # open the relay

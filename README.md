@@ -45,3 +45,7 @@ Run mcp3008_differential_simpletest.py to see if the MCP3008 library works
 
 # Control Relay
 https://tutorials-raspberrypi.com/raspberry-pi-control-relay-switch-via-gpio/
+https://pinout.xyz/
+
+# MCP3008
+https://pimylifeup.com/raspberry-pi-adc/
