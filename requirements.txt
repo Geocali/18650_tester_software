@@ -1,0 +1,5 @@
+Adafruit-Blinka
+adafruit-circuitpython-busdevice
+adafruit-circuitpython-mcp3xxx
+RPI.GPIO
+adafruit-blinka
