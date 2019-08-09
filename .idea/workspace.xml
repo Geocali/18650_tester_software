@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="a172bc5a-f3e1-4ea1-ac8f-e5e74c22c17d" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/rpy_battery_tester.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/batteries_tester_tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tester.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/batteries_tester.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tester_tests.py" beforeDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/batteries_tester.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-167">
+              <caret line="76" lean-forward="true" selection-start-line="76" selection-end-line="76" />
+              <folding>
+                <element signature="e#53#65#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests/batteries_tester_tests.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#27#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Pipfile">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>mcp</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/tester_tests.py" />
+        <option value="$PROJECT_DIR$/tester.py" />
+        <option value="$PROJECT_DIR$/tests/tester_tests.py" />
+        <option value="$PROJECT_DIR$/tests/batteries_tester_tests.py" />
+        <option value="$PROJECT_DIR$/src/batteries_tester.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="440" />
+    <option name="y" value="27" />
+    <option name="width" value="1009" />
+    <option name="height" value="948" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="rpy_battery_tester" type="b2602c69:ProjectViewProjectNode" />
+              <item name="rpy_battery_tester" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="rpy_battery_tester" type="b2602c69:ProjectViewProjectNode" />
+              <item name="rpy_battery_tester" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="rpy_battery_tester" type="b2602c69:ProjectViewProjectNode" />
+              <item name="rpy_battery_tester" type="462c0819:PsiDirectoryNode" />
+              <item name="tests" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/tester.py" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tests" />
+      <recent name="$PROJECT_DIR$/src" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Python tests.pytest for tests.batteries_tester_tests.test_tester">
+    <configuration name="batteries_tester" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="rpy_battery_tester" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.local/share/virtualenvs/rpy_battery_tester-GFWevaIc/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/batteries_tester.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for tests.batteries_tester_tests.test_tester" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="rpy_battery_tester" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.batteries_tester_tests.test_tester&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.batteries_tester" />
+      <item itemvalue="Python tests.pytest for tests.batteries_tester_tests.test_tester" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.pytest for tests.batteries_tester_tests.test_tester" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a172bc5a-f3e1-4ea1-ac8f-e5e74c22c17d" name="Default Changelist" comment="" />
+      <created>1565344625301</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1565344625301</updated>
+    </task>
+    <task id="LOCAL-00001" summary="reorganize to create tests">
+      <created>1565365078476</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1565365078476</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TestHistory">
+    <history-entry file="pytest_for_tester_tests_test_tester - 2019.08.09 at 17h 26m 40s.xml">
+      <configuration name="pytest for tester_tests.test_tester" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_tester_tests_test_tester - 2019.08.09 at 17h 26m 51s.xml">
+      <configuration name="pytest for tester_tests.test_tester" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_tester_tests_test_tester - 2019.08.09 at 17h 27m 14s.xml">
+      <configuration name="pytest for tester_tests.test_tester" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_tester_tests_test_tester - 2019.08.09 at 17h 29m 19s.xml">
+      <configuration name="pytest for tester_tests.test_tester" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_tester_tests_test_tester - 2019.08.09 at 17h 33m 51s.xml">
+      <configuration name="pytest for tester_tests.test_tester" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_tester_tests_test_tester - 2019.08.09 at 17h 34m 31s.xml">
+      <configuration name="pytest for tester_tests.test_tester" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_tester_tests_test_tester - 2019.08.09 at 17h 34m 39s.xml">
+      <configuration name="pytest for tester_tests.test_tester" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_tester_tests_test_tester - 2019.08.09 at 17h 35m 42s.xml">
+      <configuration name="pytest for tester_tests.test_tester" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_tests_tester_tests_test_tester - 2019.08.09 at 17h 46m 17s.xml">
+      <configuration name="pytest for tests.tester_tests.test_tester" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_for_tests_batteries_tester_tests_test_tester - 2019.08.09 at 17h 47m 52s.xml">
+      <configuration name="pytest for tests.batteries_tester_tests.test_tester" configurationId="tests" />
+    </history-entry>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="70" y="27" width="1850" height="948" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24958949" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32881773" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.32881773" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="reorganize to create tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="reorganize to create tests" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/test_relays.py" />
+    <entry file="file://$PROJECT_DIR$/mcp3008_differential_simpletest.py" />
+    <entry file="file://$PROJECT_DIR$/blinkatest.py" />
+    <entry file="file://$PROJECT_DIR$/Pipfile">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/batteries_tester_tests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/batteries_tester.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-167">
+          <caret line="76" lean-forward="true" selection-start-line="76" selection-end-line="76" />
+          <folding>
+            <element signature="e#53#65#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

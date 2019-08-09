@@ -75,11 +75,20 @@ def set_up_conf():
     return mcp, batt_infos
 
 
+class Battery:
+    def __init__(self, relay_gpio, mcp_pin0, mcp_pin1):
+        self.relay_gpio = relay_gpio
+        self.mcp_pin0 = mcp_pin0
+        self.mcp_pin1 = mcp_pin1
+        self.voltages_history = []
+
+
 if __name__ == "__main__":
     mcp, batt_infos = set_up_conf()
 
     # ==== beginning of the capacity measure ====
 
+    # initialization of the measure:
     # close all the relays
     batt_measures = {}
     for batt_id in list(batt_infos.keys()):
@@ -88,6 +97,7 @@ if __name__ == "__main__":
         # initialize the dictionnary that records the measures
         batt_measures[batt_id] = {'voltages': [], 'capacity': 0}
 
+    # read the voltages and record them
     i = 0
     while i < 3:
         for batt_id in list(batt_infos.keys()):
