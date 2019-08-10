@@ -10,6 +10,10 @@ adafruit-circuitpython-busdevice = "*"
 adafruit-circuitpython-mcp3xxx = "*"
 Adafruit-Blinka = "*"
 "RPi.GPIO" = "*"
+mock = "*"
+pytest = "*"
+pytest_mock = "*"
+board = "*"
 
 [requires]
 python_version = "3.7"
