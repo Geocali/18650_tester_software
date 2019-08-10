@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a172bc5a-f3e1-4ea1-ac8f-e5e74c22c17d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pipfile" beforeDir="false" afterPath="$PROJECT_DIR$/Pipfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/batteries_tester.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/batteries_tester.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -122,7 +120,14 @@
       <option name="project" value="LOCAL" />
       <updated>1565365078476</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="rewriting using the classes">
+      <created>1565466130520</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1565466130520</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -140,6 +145,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="reorganize to create tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="reorganize to create tests" />
+    <MESSAGE value="rewriting using the classes" />
+    <option name="LAST_COMMIT_MESSAGE" value="rewriting using the classes" />
   </component>
 </project>

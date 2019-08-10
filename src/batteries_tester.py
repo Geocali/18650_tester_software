@@ -14,6 +14,7 @@ import adafruit_mcp3xxx.mcp3008 as MCP
 from adafruit_mcp3xxx.analog_in import AnalogIn
 
 import time
+from datetime import datetime
 
 
 def close_relay(batt_id, batt_infos):
@@ -123,7 +124,10 @@ class BatteriesTester:
         # create a differential ADC channel between Pin 0 and Pin 1
         pin0 = self.map_slots[battery.tester_slot]['mcp_pin0']
         pin1 = self.map_slots[battery.tester_slot]['mcp_pin0']
-        return AnalogIn(self.mcp, pin0, pin1).voltage
+        voltage = AnalogIn(self.mcp, pin0, pin1).voltage
+        battery.voltages_history.append([datetime.now(), voltage])
+
+        return voltage
 
 
 if __name__ == "__main__":
