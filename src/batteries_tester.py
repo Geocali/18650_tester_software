@@ -16,12 +16,14 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 
 import time
 from datetime import datetime
+import numpy as np
 
 
 class Battery:
     def __init__(self, tester_slot):
         self.tester_slot = tester_slot
         self.voltages_history = []
+        self.tested_capacity = None
 
 
 class BatteriesTester:
@@ -35,6 +37,7 @@ class BatteriesTester:
         }
         self.history = []
         self.setup()
+        self.R = 4 # Ohm
 
     def setup(self):
         if not SIMULATION:
@@ -90,12 +93,13 @@ def manage(batteries_tester, batteries):
         batteries_tester.close_relay(battery)
 
     i = 0
-    while i < 10:
+    while i < 100:
         for battery in batteries:
             voltage = batteries_tester.read_voltage(battery)
 
             if voltage < 3:
                 batteries_tester.open_relay(battery)
+                battery.tested_capacity = sum(np.array(battery.voltages_history)[:,1]) / batteries_tester.R
 
         i += 1
     return

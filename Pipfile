@@ -14,6 +14,7 @@ mock = "*"
 pytest = "*"
 pytest_mock = "*"
 board = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.7"
