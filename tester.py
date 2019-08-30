@@ -10,7 +10,10 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 import pandas as pd
 import time
 from datetime import datetime
+import requests
+import urllib3
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def close_relay(slot_id, slot_infos):
     # ==== close the relay ====
@@ -67,22 +70,23 @@ mcp = MCP.MCP3008(spi, cs)
 # ==== beginning of the capacity measure ====
 
 # voltage under which we consider the battery as discharged
-discharged_voltage = 2
+discharged_voltage = 2.45
 # voltage above which we consider the battery as new
-min_charged_voltage = 4
+min_charged_voltage = 2.3
 # value of the resistor
 R = 4 # Ohm
 # maximum voltage that we can read when there is no battery in the slot
-voltage_empty_slot = 0.5
+voltage_empty_slot = 1
 
 # close all the relays of the slots containing a charged battery
 df_slots_history = pd.DataFrame()
 for slot_id in list(slot_infos.keys()):
+    open_relay(slot_id, slot_infos)
     voltage = read_voltage(slot_id, slot_infos, mcp)
     
     # we record it
     slot_measure = pd.Series(
-        data=[datetime.now, slot_id, voltage, slot_infos[slot_id]['relay_open'], False, 0],
+        data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, 0],
         index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
     )
     df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
@@ -94,18 +98,20 @@ for slot_id in list(slot_infos.keys()):
         # we record it (we read the voltage again, in case the relay is closed)
         voltage = read_voltage(slot_id, slot_infos, mcp)
         slot_measure = pd.Series(
-            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], True, 0],
+            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, 0],
             index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
         )
-        df_slots_history = df_slots_history.append(slot_measure)
+        df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
         
 
 # main loop
+print('ready')
 i = 0
-while i < 10:
-    print('===========')
+while i < 1000 or True:
+    # print('===========')
     for slot_id in list(slot_infos.keys()):
-        print('= slot id ', slot_id)
+        
+        # print('= slot id ', slot_id)
         
         # we read the voltage of the battery
         voltage = read_voltage(slot_id, slot_infos, mcp)
@@ -120,10 +126,11 @@ while i < 10:
         # - and current voltage < discharged_voltage
         # - and the battery is under testing
         # we send the conclusions and open the relay
+        # print("-----", last_voltage, voltage, last_testing)
         if (
             (last_voltage > discharged_voltage)
             and (voltage < discharged_voltage)
-            and last_testing
+            and last_testing == 1
         ):
             print("case 1, end of battery testing")
             
@@ -131,14 +138,25 @@ while i < 10:
             df_testing_session = df_slots_history[
                 (df_slots_history.slot_id == slot_id)
                 & (df_slots_history.testing_session == last_testing_session)
-                & (df_slots_history.testing == True)
+                & (df_slots_history.testing == 1)
             ]
             battery_capacity = df_testing_session.voltage.sum() / R / 3600 / 1000
             print('battery ' + str(slot_id) + ' tested at ' + str(battery_capacity) + ' mAh')
             
-            open_relay(slot_id, slot_infos)
+            # export to file
+            filename = str(datetime.now())[0:19].replace(":", "") + "_" + str(slot_id) + "_" + str(int(last_testing_session)) + str(int(battery_capacity)) + ".csv"
+            df_testing_session.to_csv(filename, sep=",", index=False)
+            # export file to nextcloud
+            data = open(filename, 'rb').read()
+            response = requests.put(
+                "https://savial.yourownnet.cloud/remote.php/webdav/automatic_uploads/" + filename,
+                data = data,
+                verify = False,
+                auth = ('clement.vial@gmail.com', 'genial2105')
+            )
             
-            testing = False
+            open_relay(slot_id, slot_infos)
+            last_testing = 0
             
             
         # ============= Case 2 ==================
@@ -150,9 +168,10 @@ while i < 10:
         if (
             (last_voltage < discharged_voltage)
             and (voltage > discharged_voltage)
-            and last_testing
+            and last_testing == 1
         ):
-            print("case 2, artificial voltage increase in discharged battery, not doing anything")
+            pass
+            # print("case 2, artificial voltage increase in discharged battery, not doing anything")
         
         
         # ============= Case 3 ============= 
@@ -167,12 +186,12 @@ while i < 10:
             (last_voltage > voltage_empty_slot)
             and (voltage < voltage_empty_slot)
         ):
-            print("case 3, a battery was removed")
+            # print("case 3, a battery was removed")
             
             # if the battery was under testing, we interrupt the test, and open the relay
             if last_testing:
                 print("test interrupted")
-                last_testing = False
+                last_testing = 0
                 open_relay(slot_id, slot_infos)
                 
         # ============= Case 4 ============= 
@@ -188,18 +207,20 @@ while i < 10:
             and (voltage > voltage_empty_slot)
         ):
             
-            print("case 4, a battery was inserted")
+            # print("case 4, a battery was inserted")
             last_testing_session = last_testing_session + 1
             
             if voltage > min_charged_voltage:
                 print("The battery is charged, starting test")
-                last_testing = True
+                last_testing = 1
                 close_relay(slot_id, slot_infos)
                 
             elif voltage > discharged_voltage:
-                print("The battery is not fully charged, not starting test")
+                # print("The battery is not fully charged, not starting test")
+                pass
             else:
-                print("The battery is discharged, not starting test")
+                # print("The battery is discharged, not starting test")
+                pass
             
         # ============= Case 5 ============= 
         # if
@@ -210,7 +231,8 @@ while i < 10:
             (last_voltage < voltage_empty_slot)
             and (voltage < voltage_empty_slot)
         ):
-            print("case 5, still empty slot")
+            # print("case 5, still empty slot")
+            pass
             
         # ============= Case 6 ============= 
         # if
@@ -223,16 +245,17 @@ while i < 10:
             and (voltage > voltage_empty_slot)
             and (voltage < discharged_voltage)
         ):
-            print("case 6, still empty battery")
-            
+            # print("case 6, still empty battery")
+            pass
         
         slot_measure = pd.Series(
-                data=[datetime.now, slot_id, voltage, slot_infos[slot_id]['relay_open'], last_testing, last_testing_session],
+                data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], last_testing, last_testing_session],
                 index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
             )
         df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
         
-        print('batt ' + str(slot_id) + ": " + str(voltage))
+        if last_testing == 1:
+            print('batt ' + str(slot_id) + ": " + str(last_voltage) + "/" + str(voltage))
         
     time.sleep(1)
     i += 1
