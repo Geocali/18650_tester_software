@@ -14,6 +14,7 @@ import requests
 import urllib3
 import sys
 import creds
+from sqlalchemy import create_engine
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -80,6 +81,8 @@ R = 4 # Ohm
 # maximum voltage that we can read when there is no battery in the slot
 voltage_empty_slot = 1
 
+engine = create_engine("sqlite:///output/measures.db")
+
 # close all the relays of the slots containing a charged battery
 df_slots_history = pd.DataFrame()
 for slot_id in list(slot_infos.keys()):
@@ -103,6 +106,11 @@ for slot_id in list(slot_infos.keys()):
             data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, 0],
             index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
         )
+        
+        conn = engine.connect()
+        pd.DataFrame(slot_measure).T.to_sql('measures', conn, if_exists="append")
+        conn.close()
+        
         df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
         
 
@@ -252,14 +260,19 @@ while True:
             ):
                 # print("case 6, still empty battery")
                 pass
-            
+            timenow = datetime.now()
             slot_measure = pd.Series(
-                    data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], last_testing, last_testing_session],
+                    data=[timenow, slot_id, voltage, slot_infos[slot_id]['relay_open'], last_testing, last_testing_session],
                     index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
                 )
             df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
             
-            if last_testing == 1 or True:
+            conn = engine.connect()
+            pd.DataFrame(slot_measure).T.to_sql('measures', conn, if_exists="append")
+            conn.close()
+            
+            
+            if last_testing == 1:
                 print('batt ' + str(slot_id) + ": " + str(last_voltage) + "/" + str(voltage))
             
         time.sleep(1)
@@ -267,16 +280,7 @@ while True:
     except KeyboardInterrupt:
         for slot_id in list(slot_infos.keys()):
             open_relay(slot_id, slot_infos)
+        conn.close()
+        engine.dispose()
         sys.exit()
 
-
-# for each battery
-# while the voltage > 3V, record the voltages
-# when voltage < 3V, open the relay of this battery, and send the total capacity
-
-# open all the relays
-for slot_id in list(slot_infos.keys()):
-    open_relay(slot_id, slot_infos)
-    time.sleep(0.5)
-    
-#print(df_slots_history)
