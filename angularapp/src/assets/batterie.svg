@@ -1,4 +1,5 @@
-<p>battery-details works!</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg:svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -7,13 +8,53 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="10px"
-   height="10px"
-   >
-
+   width="81.844444mm"
+   height="121.35555mm"
+   viewBox="0 0 289.99999 429.99999"
+   id="svg4152"
+   version="1.1"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="batterie.svg">
+  <link
+     type="text/css"
+     id="dark-mode"
+     rel="stylesheet"
+     href="" />
+  <style
+     type="text/css"
+     id="dark-mode-custom-style" />
   <svg:defs
      id="defs4154" />
-
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="55.966794"
+     inkscape:cy="135.16567"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <svg:metadata
+     id="metadata4157">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </svg:metadata>
   <svg:g
      inkscape:label="batt_back"
      inkscape:groupmode="layer"
