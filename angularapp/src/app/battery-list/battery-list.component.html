@@ -1,0 +1,15 @@
+<h2>Batteries</h2>
+
+<div *ngFor="let battery of batteries; index as slot_id">
+
+  <h3>
+    <a [title]="slot_id + ' details'">
+      {{ battery.slot_id }}
+    </a>
+  </h3>
+
+    <p>
+        Voltage: {{ battery.voltage }}
+    </p>
+
+</div>
