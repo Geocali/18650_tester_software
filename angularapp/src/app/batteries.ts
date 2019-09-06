@@ -1,7 +1,7 @@
 export const batteries = [
     {
         slot_id: 1,
-        voltage: 3.2,
+        voltage: 3.3,
         testing: false
     },
     {

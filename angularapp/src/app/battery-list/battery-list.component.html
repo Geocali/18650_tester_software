@@ -1,17 +1,15 @@
 <h2>Batteries</h2>
 
-<div *ngFor="let battery of batteries; index as slot_id">
+<mat-grid-list cols="2" rowHeight="1:1">
+  <mat-grid-tile *ngFor="let battery of batteries; index as slot_id">
 
-  <h3>
-    <a [title]="slot_id + ' details'">
-      {{ battery.slot_id }}
-    </a>
-  </h3>
 
     <p>
-        Voltage: {{ battery.voltage }}
+      Voltage: {{ battery.voltage }}
     </p>
 
     <app-battery-details></app-battery-details>
 
-</div>
+
+  </mat-grid-tile>
+</mat-grid-list>
