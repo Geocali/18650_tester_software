@@ -19,6 +19,7 @@ ls -l /dev/spidev*
 
 ## Install libraries
 pip3 install -f requirements.txt
+sudo apt-get install libmariadbclient-dev
 
 ## Test I2C and SPI libraries
 '''import board

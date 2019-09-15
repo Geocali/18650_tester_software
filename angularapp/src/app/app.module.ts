@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {MatGridListModule} from '@angular/material/grid-list';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -18,6 +19,7 @@ import { BatteryDetailsComponent } from './battery-details/battery-details.compo
   imports: [
     BrowserModule,
     AppRoutingModule,
+    HttpClientModule,
     MatGridListModule,
     RouterModule.forRoot([
       { path: '', component: BatteryListComponent },

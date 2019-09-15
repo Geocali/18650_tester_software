@@ -1,7 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { RouteConfigLoadStart } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+
+import { Observable, interval } from 'rxjs';
+import { map } from 'rxjs/operators';
+//import 'rxjs/add/observable/interval';
+//import 'rxjs/add/operator/startWith';
+//import 'rxjs/add/operator/switchMap';
+
 import { Battery } from '../battery';
 import { BatteryService } from '../battery.service';
-import { RouteConfigLoadStart } from '@angular/router';
+import { ApiService } from './../api.service';
 
 @Component({
   selector: 'app-battery-list',
@@ -9,35 +18,26 @@ import { RouteConfigLoadStart } from '@angular/router';
   styleUrls: ['./battery-list.component.css']
 })
 export class BatteryListComponent implements OnInit {
+  //@Input() batteries: Observable<Battery[]>;
   batteries: Battery[];
 
-  constructor(private batteryService: BatteryService) { }
+  constructor(private api: ApiService, private http: HttpClient) { }
 
   ngOnInit() {
-    this.getbatteries();
-    //this.getcolors(this.batteries);
+
+    // Create an Observable that will publish a value on an interval
+    const secondsCounter = interval(1000);
+    // Subscribe to begin publishing values
+    secondsCounter.subscribe(n => this.api.getBatteries().subscribe(
+      batteries => this.batteries = batteries
+    ));
     
   }
 
-  getbatteries(): void {
-    this.batteries = this.batteryService.getBatteries();
-  }
+  getItems(): Observable<Battery[]> {
+    const url = 'http://localhost:5000/battery_measures';
+    return this.http.get<Battery[]>(url);
 
-  /* getcolors(batteries): void {
-    let colors = [];
-    
-    this.batteries.forEach(function(battery) {
-      
-      if (battery.voltage >= 4) {
-        colors.push('green');
-      } else if ((battery.voltage < 4) && (battery.voltage > 3)) {
-        colors.push('orange');
-      } else {
-        colors.push('red');
-      }
-      
-    })
-    this.colors = colors;
-  } */
+  }
 
 }

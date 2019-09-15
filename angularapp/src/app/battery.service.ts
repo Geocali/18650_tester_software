@@ -4,7 +4,7 @@ import {Observable, of} from 'rxjs';
 
 import { Battery } from './battery'
 // import { batteries } from './batteries'
-import batteries from "../../../output/batteries.json";
+import batteries from "../../../flaskapp/output/batteries.json";
 
 
 @Injectable({
