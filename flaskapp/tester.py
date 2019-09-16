@@ -1,11 +1,58 @@
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM) # GPIO Numbers instead of board numbers
+try:
+    import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM) # GPIO Numbers instead of board numbers
+    import busio
+    import digitalio
+    import board
+    import adafruit_mcp3xxx.mcp3008 as MCP
+    from adafruit_mcp3xxx.analog_in import AnalogIn
+    env = "rpy"
+except RuntimeError:
+    env = "not_rpy"
 
-import busio
-import digitalio
-import board
-import adafruit_mcp3xxx.mcp3008 as MCP
-from adafruit_mcp3xxx.analog_in import AnalogIn
+    class MCP:
+        P0 = 0
+        P1 = 1
+        P2 = 2
+        P3 = 3
+        P4 = 4
+        P5 = 5
+        P6 = 6
+        P7 = 7
+
+        def MCP3008(spi, cs):
+            return None
+
+    class board:
+        SCK = "SCK"
+        MISO = "MISO"
+        MOSI = "MOSI"
+        CE0 = "CE0"
+
+    class busio:
+        def SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI):
+            return None
+
+    class digitalio:
+        def DigitalInOut(CE0):
+            return None
+
+    class GPIO:
+        OUT = "OUT"
+        HIGH = "HIGH"
+        LOW = "LOW"
+
+        def setup(a, b):
+            return None
+
+        def output(selfa, b):
+            return None
+
+    class AnalogInclass:
+        voltage = 3.1
+
+    def AnalogIn(mcp, pin0, pin1):
+        return AnalogInclass
 
 import pandas as pd
 import time
@@ -18,6 +65,7 @@ from sqlalchemy import create_engine
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+
 def close_relay(slot_id, slot_infos):
     # ==== close the relay ====
     RELAY_GPIO = slot_infos[slot_id]["relay_gpio"]
@@ -28,6 +76,7 @@ def close_relay(slot_id, slot_infos):
     slot_infos[slot_id]["relay_open"] = False
     time.sleep(0.5)
     return
+
 
 def open_relay(slot_id, slot_infos):
     # ==== close the relay ====
@@ -40,12 +89,14 @@ def open_relay(slot_id, slot_infos):
     time.sleep(0.5)
     return
 
+
 def read_voltage(slot_id, slot_infos, mcp):
     # create a differential ADC channel between Pin 0 and Pin 1
     pin0 = slot_infos[slot_id]["mcp_pin0"]
     pin1 = slot_infos[slot_id]["mcp_pin1"]
     time.sleep(0.1)
     return AnalogIn(mcp, pin0, pin1).voltage / 3.3 * 5
+
 
 def read_all_voltages_t(slot_infos, mcp):
     for slot_id in list(slot_infos.keys()):
@@ -54,6 +105,7 @@ def read_all_voltages_t(slot_infos, mcp):
         voltage = read_voltage(slot_id, slot_infos, mcp)
         open_relay(slot_id, slot_infos)
         print('Voltage batt ' + str(slot_id) + ": " + str(voltage) + 'V')
+
 
 slot_infos = {
     1: {"relay_gpio":5, "mcp_pin0": MCP.P0, "mcp_pin1": MCP.P1, "relay_open": True, "testing": False},
