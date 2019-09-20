@@ -13,7 +13,7 @@ import batteries from "../../../flaskapp/output/batteries.json";
 export class BatteryService {
 
   constructor() { }
-
+  
   getBatteries(): Battery[] {
     return batteries;
   }

@@ -1,3 +1,16 @@
+import pandas as pd
+import time
+from datetime import datetime
+import requests
+import urllib3
+import sys
+import creds
+from sqlalchemy import create_engine, types
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+i = 0
+
 try:
     import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM) # GPIO Numbers instead of board numbers
@@ -9,6 +22,8 @@ try:
     env = "rpy"
 except RuntimeError:
     env = "not_rpy"
+
+    # we create dummy objects to allow testing
 
     class MCP:
         P0 = 0
@@ -48,22 +63,43 @@ except RuntimeError:
         def output(selfa, b):
             return None
 
-    class AnalogInclass:
-        voltage = 3.1
-
     def AnalogIn(mcp, pin0, pin1):
+
+        slot_id = pin0 / 2 + 1
+        voltage_start = 0
+        delta = 0.01
+        if i == 0:
+            # the program is starting
+            if slot_id == 1:
+                voltage_start = 0
+            elif slot_id == 2:
+                voltage_start = 0
+            elif slot_id == 3:
+                voltage_start = 0
+            elif slot_id == 4:
+                voltage_start = 0
+        else:
+            if slot_id == 1:
+                voltage_start = 4.1 - delta * i
+            elif slot_id == 2:
+                voltage_start = 4.15 - delta * i
+            elif slot_id == 3:
+                voltage_start = 4.2 - delta * i
+            elif slot_id == 4:
+                voltage_start = 4.25 - delta * i
+        # else:
+        #     conn = engine.connect()
+        #     df = pd.read_sql_query("SELECT * FROM measures", conn)
+        #     conn.close()
+        #     df_curr = df[(df.slot_id == slot_id) & (df.testing_session == df.testing_session.max())]
+        #     voltage_start = df_curr.tail(1).voltage.values[0] - 0.05
+
+        # infos for this slot and last testing session
+        class AnalogInclass:
+
+            voltage = voltage_start * 3.3 / 5
+
         return AnalogInclass
-
-import pandas as pd
-import time
-from datetime import datetime
-import requests
-import urllib3
-import sys
-import creds
-from sqlalchemy import create_engine
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def close_relay(slot_id, slot_infos):
@@ -134,6 +170,7 @@ R = 4 # Ohm
 voltage_empty_slot = 1
 
 engine = create_engine("sqlite:///output/measures.db")
+engine = create_engine("mysql+pymysql://root:caramel@localhost:3306/battery_schema")
 
 # close all the relays of the slots containing a charged battery
 df_slots_history = pd.DataFrame()
@@ -142,8 +179,9 @@ for slot_id in list(slot_infos.keys()):
     voltage = read_voltage(slot_id, slot_infos, mcp)
     
     # we record it
+    testing_session = 0
     slot_measure = pd.Series(
-        data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, 0],
+        data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, testing_session],
         index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
     )
     df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
@@ -155,12 +193,14 @@ for slot_id in list(slot_infos.keys()):
         # we record it (we read the voltage again, in case the relay is closed)
         voltage = read_voltage(slot_id, slot_infos, mcp)
         slot_measure = pd.Series(
-            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, 0],
+            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, testing_session],
             index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
         )
         
         conn = engine.connect()
-        pd.DataFrame(slot_measure).T.to_sql('measures', conn, if_exists="append")
+        df = pd.DataFrame(slot_measure)
+        df[0] = df[0].astype(str)
+        df.T.to_sql('measures', conn, if_exists="append", index=False)
         conn.close()
         
         df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
@@ -169,6 +209,8 @@ for slot_id in list(slot_infos.keys()):
 # main loop
 print('ready')
 print('stop the program with ctr+c')
+
+
 i = 0
 while True:
     
@@ -180,12 +222,24 @@ while True:
             
             # we read the voltage of the battery
             voltage = read_voltage(slot_id, slot_infos, mcp)
+
             last_measure = df_slots_history[df_slots_history.slot_id == slot_id].tail(1)
-            
             last_testing_session = last_measure.testing_session.values[0]
             last_testing = last_measure.testing.values[0]
             last_voltage = last_measure.voltage.values[0]
-            
+            a = 1
+
+            # if i > 0:
+            #
+            #     last_testing_session = last_measure.testing_session.values[0]
+            #     last_testing = last_measure.testing.values[0]
+            #     last_voltage = last_measure.voltage.values[0]
+            # else:
+            #     # if we just started the program
+            #     last_testing_session = last_measure.testing_session.values[0] + 1
+            #     last_testing = 0
+            #     last_voltage = voltage
+
             # ============= Case 1 ==================
             # - the preceding voltage was > discharged_voltage
             # - and current voltage < discharged_voltage
@@ -211,19 +265,21 @@ while True:
                 # export to file
                 filename = str(datetime.now())[0:19].replace(":", "") + "_" + str(slot_id) + "_" + str(int(last_testing_session)) + "_" + str(int(battery_capacity)) + "mAh.csv"
                 df_testing_session.to_csv("output/" + filename, sep=",", index=False)
+
                 # export file to nextcloud
-                data = open("output/" + filename, 'rb').read()
-                response = requests.put(
-                    "https://savial.yourownnet.cloud/remote.php/webdav/automatic_uploads/" + filename,
-                    data = data,
-                    verify = False,
-                    auth = (creds.login, creds.password)
-                )
+                export_nextcloud = False
+                if export_nextcloud:
+                    data = open("output/" + filename, 'rb').read()
+                    response = requests.put(
+                        "https://savial.yourownnet.cloud/remote.php/webdav/automatic_uploads/" + filename,
+                        data=data,
+                        verify=False,
+                        auth=(creds.login, creds.password)
+                    )
                 
                 open_relay(slot_id, slot_infos)
                 last_testing = 0
-                
-                
+
             # ============= Case 2 ==================
             # if
             # - the preceding voltage was < discharged_voltage
@@ -237,8 +293,7 @@ while True:
             ):
                 pass
                 # print("case 2, artificial voltage increase in discharged battery, not doing anything")
-            
-            
+
             # ============= Case 3 ============= 
             # if
             # - the preceding voltage was > 0(+delta)
@@ -273,6 +328,11 @@ while True:
             ):
                 
                 # print("case 4, a battery was inserted")
+                result = pd.read_sql_query("SELECT MAX(testing_session) FROM measures", engine)
+                if result.values[0][0] is not None:
+                    last_testing_session = result.values[0][0]
+                else:
+                    last_testing_session = slot_id
                 last_testing_session = last_testing_session + 1
                 
                 if voltage > min_charged_voltage:
@@ -320,10 +380,19 @@ while True:
             df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
             
             conn = engine.connect()
-            pd.DataFrame(slot_measure).T.to_sql('measures', conn, if_exists="append")
+            # dtypes = {
+            #     "time": types.DATETIME(),
+            #     "slot_id": types.INTEGER(),
+            #     "voltage": types.FLOAT(),
+            #     "relay_open": types.BOOLEAN(),
+            #     "testing": types.BOOLEAN(),
+            #     "testing_session": types.INTEGER()
+            # }
+            df = pd.DataFrame(slot_measure)
+            df[0] = df[0].astype(str)
+            df.T.to_sql('measures', conn, if_exists="append", index=False)
             conn.close()
-            
-            
+
             if last_testing == 1:
                 print('batt ' + str(slot_id) + ": " + str(last_voltage) + "/" + str(voltage))
             

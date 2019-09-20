@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify
 import mysql.connector as mariadb
+import pandas as pd
 
 from flask_cors import CORS
 
@@ -13,12 +14,12 @@ def main():
     return render_template('battery_test.html', img=img)
 
 
-@app.route("/battery_measures", methods=['GET'])
-def get_battery_measures():
+@app.route("/all_battery_measures", methods=['GET'])
+def get_all_battery_measures():
     mariadb_connection = mariadb.connect(user='root', password='caramel', database='battery_schema')
     cursor = mariadb_connection.cursor()
 
-    cursor.execute("SELECT slot_id, voltage, testing FROM battery_measures")
+    cursor.execute("SELECT * FROM measures")
     data = []
     columns = tuple([d[0] for d in cursor.description])
     for row in cursor:
@@ -28,6 +29,26 @@ def get_battery_measures():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+@app.route("/last_battery_measures", methods=['GET'])
+def get_last_battery_measures():
+    mariadb_connection = mariadb.connect(user='root', password='caramel', database='battery_schema')
+    cursor = mariadb_connection.cursor()
+
+    cursor.execute("SELECT * FROM measures")
+    data = []
+    columns = tuple([d[0] for d in cursor.description])
+    for row in cursor:
+        data.append(dict(zip(columns, row)))
+    mariadb_connection.close()
+    df_data = pd.DataFrame(data)
+    r_data = []
+    for slot_id in df_data.slot_id.unique():
+        df_slot = df_data[df_data.slot_id == slot_id]
+        last_measure = list(df_slot[df_slot.time == df_slot.time.max()].values[0])
+        r_data.append(last_measure)
+    response = jsonify(r_data)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 if __name__ == "__main__":
     app.run()
