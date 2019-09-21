@@ -6,6 +6,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def main():
     #return render_template('battery_test.html')
@@ -29,6 +30,7 @@ def get_all_battery_measures():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+
 @app.route("/last_battery_measures", methods=['GET'])
 def get_last_battery_measures():
     mariadb_connection = mariadb.connect(user='root', password='caramel', database='battery_schema')
@@ -44,11 +46,12 @@ def get_last_battery_measures():
     r_data = []
     for slot_id in df_data.slot_id.unique():
         df_slot = df_data[df_data.slot_id == slot_id]
-        last_measure = list(df_slot[df_slot.time == df_slot.time.max()].values[0])
-        r_data.append(last_measure)
+        last_measure = df_slot[df_slot.time == df_slot.time.max()]
+        r_data.append(last_measure.to_dict("records")[0])
     response = jsonify(r_data)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
 
 if __name__ == "__main__":
     app.run()
