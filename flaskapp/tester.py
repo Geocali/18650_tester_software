@@ -168,6 +168,8 @@ min_charged_voltage = 4
 R = 4 # Ohm
 # maximum voltage that we can read when there is no battery in the slot
 voltage_empty_slot = 1
+# time between measures
+delta_t = 0.1  # seconds
 
 engine = create_engine("sqlite:///output/measures.db")
 engine = create_engine("mysql+pymysql://root:caramel@localhost:3306/battery_schema")
@@ -228,6 +230,8 @@ while True:
             last_testing = last_measure.testing.values[0]
             last_voltage = last_measure.voltage.values[0]
             a = 1
+            if voltage < discharged_voltage:
+                a = 1
 
             # if i > 0:
             #
@@ -248,7 +252,7 @@ while True:
             # print("-----", last_voltage, voltage, last_testing)
             if (
                 (last_voltage > discharged_voltage)
-                and (voltage < discharged_voltage)
+                and (voltage <= discharged_voltage)
                 and last_testing == 1
             ):
                 print("case 1, end of battery testing")
@@ -396,7 +400,7 @@ while True:
             if last_testing == 1:
                 print('batt ' + str(slot_id) + ": " + str(last_voltage) + "/" + str(voltage))
             
-        time.sleep(1)
+        time.sleep(delta_t)
         i += 1
     except KeyboardInterrupt:
         for slot_id in list(slot_infos.keys()):

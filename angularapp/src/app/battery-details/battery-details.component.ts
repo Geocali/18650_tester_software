@@ -15,6 +15,8 @@ import { stringify } from '@angular/compiler/src/util';
 export class BatteryDetailsComponent implements OnInit {
   @Input()
   voltage: number;
+  @Input()
+  testing: boolean;
 
   voltage_height = "71.428551";
   //style = "'opacity:1;fill:#d40000;fill-opacity:1;stroke:none;stroke-width:20;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1'";

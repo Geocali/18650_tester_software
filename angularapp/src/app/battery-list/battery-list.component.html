@@ -7,9 +7,10 @@
 
     <p>
       Voltage: {{ battery.voltage }}
+      Testing: {{ battery.testing == true}}
     </p>
 
-    <app-battery-details [voltage]="battery.voltage"></app-battery-details>
+    <app-battery-details [voltage]="battery.voltage" [testing]="battery.testing"></app-battery-details>
 
 
   </mat-grid-tile>
