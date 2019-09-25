@@ -17,6 +17,8 @@ export class BatteryDetailsComponent implements OnInit {
   voltage: number;
   @Input()
   testing: boolean;
+  @Input()
+  total_ah: number;
 
   voltage_height = "71.428551";
   //style = "'opacity:1;fill:#d40000;fill-opacity:1;stroke:none;stroke-width:20;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1'";
@@ -32,7 +34,7 @@ export class BatteryDetailsComponent implements OnInit {
     this.geom = this.getgeom(this.voltage);
     this.ypos = this._sanitizer.sanitize(SecurityContext.HTML, this.geom['ypos']);
     this.height = this._sanitizer.sanitize(SecurityContext.HTML, this.geom['height']);
-    
+
   }
 
   getcolor(voltage): string {

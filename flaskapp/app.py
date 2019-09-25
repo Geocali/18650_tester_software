@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify
 import mysql.connector as mariadb
 import pandas as pd
+import numpy as np
 
 from flask_cors import CORS
 
@@ -47,6 +48,16 @@ def get_last_battery_measures():
     for slot_id in df_data.slot_id.unique():
         df_slot = df_data[df_data.slot_id == slot_id]
         last_measure = df_slot[df_slot.time == df_slot.time.max()]
+
+        data_testing = df_slot[(df_slot.testing == 1) & (df_slot.testing_session == df_slot.testing_session.max())]
+        tot_mah = 0
+        timediffs = (data_testing.time.diff() / np.timedelta64(1, 'h')).values[1:]
+        voltages = data_testing.iloc[1:].voltage.values
+        currents = voltages / 4  # R = 4 Ohm
+        total_mah = (timediffs * currents).sum()
+
+        last_measure['total_ah'] = total_mah
+
         r_data.append(last_measure.to_dict("records")[0])
     response = jsonify(r_data)
     response.headers.add('Access-Control-Allow-Origin', '*')

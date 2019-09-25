@@ -75,7 +75,25 @@
             [attr.fill]="color"
              />
 
-      
+      <svg:text
+         [attr.x]="150"
+         [attr.y]="180"
+         [attr.text-anchor]="middle"
+         [attr.font-size]="29"
+         [attr.font-family]="'Helvetica'"
+         [attr.fill]="'#000'">
+         {{ voltage | number:'1.1-1'}} V
+      </svg:text>
+
+      <svg:text
+         [attr.x]="120"
+         [attr.y]="220"
+         [attr.text-anchor]="middle"
+         [attr.font-size]="29"
+         [attr.font-family]="'Helvetica'"
+         [attr.fill]="'#000'">
+         {{ total_ah | number:'1.3-3'}} Ah
+      </svg:text>
 
   </svg:g>
 
@@ -88,6 +106,9 @@
        d="M 144.64285,182.90177 V 354.33034"
        id="path69"
        inkscape:connector-curvature="0" />
+
+   
+
   </svg:g>
 
 
