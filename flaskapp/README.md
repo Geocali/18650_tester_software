@@ -50,3 +50,10 @@ https://pinout.xyz/
 
 # MCP3008
 https://pimylifeup.com/raspberry-pi-adc/
+
+# Run the app
+pip install pipenv
+# add this line to ~/.profile
+PATH=$PATH:/home/pi/.local/bin
+pipenv install
+python app.py
