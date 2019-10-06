@@ -337,7 +337,7 @@ while True:
                     last_testing_session = result.values[0][0]
                 else:
                     last_testing_session = slot_id
-                last_testing_session = last_testing_session + 1
+                last_testing_session = float(last_testing_session) + 1
                 
                 if voltage > min_charged_voltage:
                     print("The battery is charged, starting test")

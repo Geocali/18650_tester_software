@@ -6,11 +6,16 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+numpy="*"
+pandas="*"
 adafruit-circuitpython-busdevice = "*"
 adafruit-circuitpython-mcp3xxx = "*"
 Adafruit-Blinka = "*"
 "RPi.GPIO" = "*"
 flask = "*"
+flask_cors = "*"
+mysql="*"
+mysql-connector-python="*"
 
 [requires]
 python_version = "3.7"
