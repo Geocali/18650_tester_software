@@ -3,7 +3,6 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import * as d3 from 'd3';
 
-import { BatteryService } from '../battery.service';
 import { Battery } from '../battery';
 import { stringify } from '@angular/compiler/src/util';
 
@@ -16,7 +15,7 @@ export class BatteryDetailsComponent implements OnInit {
   @Input()
   voltage: number;
   @Input()
-  testing: boolean;
+  testing: number;
   @Input()
   total_ah: number;
 
@@ -27,7 +26,7 @@ export class BatteryDetailsComponent implements OnInit {
   ypos: string;
   height: string;
 
-  constructor(private _sanitizer: DomSanitizer, private batteryService: BatteryService) { }
+  constructor(private _sanitizer: DomSanitizer) { }
 
   ngOnInit() {
     this.color = this._sanitizer.sanitize(SecurityContext.HTML, this.getcolor(this.voltage));

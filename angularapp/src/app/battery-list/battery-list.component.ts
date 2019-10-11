@@ -20,7 +20,7 @@ export class BatteryListComponent implements OnInit {
   ngOnInit() {
 
     // Create an Observable that will publish a value on an interval
-    const secondsCounter = interval(1000);
+    const secondsCounter = interval(5000);
     // Subscribe to begin publishing values
     secondsCounter.subscribe(n => this.api.getBatteries().subscribe(
       batteries => this.batteries = batteries
