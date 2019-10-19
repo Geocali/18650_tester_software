@@ -204,7 +204,7 @@ R = 4 # Ohm
 # maximum voltage that we can read when there is no battery in the slot
 voltage_empty_slot = 1
 # time between measures
-delta_t =   # seconds
+delta_t = 0.1  # seconds
 
 engine = create_engine("sqlite:///output/measures.db")
 engine = create_engine("mysql+pymysql://root:caramel@localhost:3306/battery_schema")
@@ -231,6 +231,13 @@ while True:
             last_testing_session = last_measure.testing_session.values[0]
             last_testing = last_measure.testing.values[0]
             last_voltage = last_measure.voltage.values[0]
+            
+            # ============= Case 1 ==================
+            # - the preceding voltage was > discharged_voltage
+            # - and current voltage < discharged_voltage
+            # - and the battery is under testing
+            # we send the conclusions and open the relay
+            # print("-----", last_voltage, voltage, last_testing)
 
             if (
                 (last_voltage > discharged_voltage)
