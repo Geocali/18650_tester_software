@@ -169,7 +169,7 @@ R = 4 # Ohm
 # maximum voltage that we can read when there is no battery in the slot
 voltage_empty_slot = 1
 # time between measures
-delta_t = 0.1  # seconds
+delta_t =   # seconds
 
 engine = create_engine("sqlite:///output/measures.db")
 engine = create_engine("mysql+pymysql://root:caramel@localhost:3306/battery_schema")
