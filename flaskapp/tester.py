@@ -142,6 +142,41 @@ def read_all_voltages_t(slot_infos, mcp):
         open_relay(slot_id, slot_infos)
         print('Voltage batt ' + str(slot_id) + ": " + str(voltage) + 'V')
 
+def relays_initialization(slot_infos, mcp, engine):
+    # close all the relays of the slots containing a charged battery
+    df_slots_history = pd.DataFrame()
+    for slot_id in list(slot_infos.keys()):
+        open_relay(slot_id, slot_infos)
+        voltage = read_voltage(slot_id, slot_infos, mcp)
+
+        # we record it
+        testing_session = 0
+        slot_measure = pd.Series(
+            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, testing_session],
+            index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
+        )
+        df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
+
+        # if the battery is charged, we test it
+        if voltage > min_charged_voltage:
+            close_relay(slot_id, slot_infos)
+
+            # we record it (we read the voltage again, in case the relay is closed)
+            voltage = read_voltage(slot_id, slot_infos, mcp)
+            slot_measure = pd.Series(
+                data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, testing_session],
+                index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
+            )
+
+            conn = engine.connect()
+            df = pd.DataFrame(slot_measure)
+            df[0] = df[0].astype(str)
+            df.T.to_sql('measures', conn, if_exists="append", index=False)
+            conn.close()
+
+            df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
+    return df_slots_history
+
 
 slot_infos = {
     1: {"relay_gpio":5, "mcp_pin0": MCP.P0, "mcp_pin1": MCP.P1, "relay_open": True, "testing": False},
@@ -174,39 +209,7 @@ delta_t =   # seconds
 engine = create_engine("sqlite:///output/measures.db")
 engine = create_engine("mysql+pymysql://root:caramel@localhost:3306/battery_schema")
 
-# close all the relays of the slots containing a charged battery
-df_slots_history = pd.DataFrame()
-for slot_id in list(slot_infos.keys()):
-    open_relay(slot_id, slot_infos)
-    voltage = read_voltage(slot_id, slot_infos, mcp)
-    
-    # we record it
-    testing_session = 0
-    slot_measure = pd.Series(
-        data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, testing_session],
-        index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
-    )
-    df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
-
-    # if the battery is charged, we test it
-    if voltage > min_charged_voltage:
-        close_relay(slot_id, slot_infos)
-    
-        # we record it (we read the voltage again, in case the relay is closed)
-        voltage = read_voltage(slot_id, slot_infos, mcp)
-        slot_measure = pd.Series(
-            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, testing_session],
-            index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
-        )
-        
-        conn = engine.connect()
-        df = pd.DataFrame(slot_measure)
-        df[0] = df[0].astype(str)
-        df.T.to_sql('measures', conn, if_exists="append", index=False)
-        conn.close()
-        
-        df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
-        
+df_slots_history = relays_initialization(slot_infos, mcp, engine)
 
 # main loop
 print('ready')
