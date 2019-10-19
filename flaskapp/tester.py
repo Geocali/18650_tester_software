@@ -350,7 +350,7 @@ while True:
             ):
                 
                 # print("case 4, a battery was inserted")
-                result = pd.read_sql_query("SELECT MAX(testing_session) FROM measures", engine)
+                result = pd.read_sql_query("SELECT ROUND(MAX(CAST(testing_session AS DECIMAL(4, 3)))) FROM measures", engine)
                 if result.values[0][0] is not None:
                     last_testing_session = result.values[0][0]
                 else:
