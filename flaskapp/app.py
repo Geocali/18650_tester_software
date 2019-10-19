@@ -51,7 +51,7 @@ def get_last_battery_measures():
                                      + " AND measures.slot_id = " \
                                      + str(last_measure.slot_id.values[0]) \
                                      + " AND measures.testing = 1"
-        data_testing = pd.read_sql_query(request_times_last_session, mariadb_connection)
+        data_testing = pd.read_sql_query(request_times_last_session, mariadb_connection, parse_dates=['time'])
 
         timediffs = (data_testing.time.diff() / np.timedelta64(1, 'h')).values[1:]
         voltages = data_testing.iloc[1:].voltage.values
