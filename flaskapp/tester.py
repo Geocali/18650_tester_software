@@ -143,6 +143,42 @@ def read_all_voltages_t(slot_infos, mcp):
         print('Voltage batt ' + str(slot_id) + ": " + str(voltage) + 'V')
 
 
+def relays_initialization(slot_infos, mcp, engine):
+    # close all the relays of the slots containing a charged battery
+    df_slots_history = pd.DataFrame()
+    for slot_id in list(slot_infos.keys()):
+        open_relay(slot_id, slot_infos)
+        voltage = read_voltage(slot_id, slot_infos, mcp)
+
+        # we record it
+        testing_session = 0
+        slot_measure = pd.Series(
+            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, testing_session],
+            index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
+        )
+        df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
+
+        # if the battery is charged, we test it
+        if voltage > min_charged_voltage:
+            close_relay(slot_id, slot_infos)
+
+            # we record it (we read the voltage again, in case the relay is closed)
+            voltage = read_voltage(slot_id, slot_infos, mcp)
+            slot_measure = pd.Series(
+                data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, testing_session],
+                index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
+            )
+
+            conn = engine.connect()
+            df = pd.DataFrame(slot_measure)
+            df[0] = df[0].astype(str)
+            df.T.to_sql('measures', conn, if_exists="append", index=False)
+            conn.close()
+
+            df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
+    return df_slots_history
+
+
 slot_infos = {
     1: {"relay_gpio":5, "mcp_pin0": MCP.P0, "mcp_pin1": MCP.P1, "relay_open": True, "testing": False},
     2: {"relay_gpio":6, "mcp_pin0": MCP.P2, "mcp_pin1": MCP.P3, "relay_open": True, "testing": False},
@@ -174,44 +210,11 @@ delta_t = 0.1  # seconds
 engine = create_engine("sqlite:///output/measures.db")
 engine = create_engine("mysql+pymysql://root:caramel@localhost:3306/battery_schema")
 
-# close all the relays of the slots containing a charged battery
-df_slots_history = pd.DataFrame()
-for slot_id in list(slot_infos.keys()):
-    open_relay(slot_id, slot_infos)
-    voltage = read_voltage(slot_id, slot_infos, mcp)
-    
-    # we record it
-    testing_session = 0
-    slot_measure = pd.Series(
-        data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, testing_session],
-        index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
-    )
-    df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
-
-    # if the battery is charged, we test it
-    if voltage > min_charged_voltage:
-        close_relay(slot_id, slot_infos)
-    
-        # we record it (we read the voltage again, in case the relay is closed)
-        voltage = read_voltage(slot_id, slot_infos, mcp)
-        slot_measure = pd.Series(
-            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, testing_session],
-            index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
-        )
-        
-        conn = engine.connect()
-        df = pd.DataFrame(slot_measure)
-        df[0] = df[0].astype(str)
-        df.T.to_sql('measures', conn, if_exists="append", index=False)
-        conn.close()
-        
-        df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
-        
+df_slots_history = relays_initialization(slot_infos, mcp, engine)
 
 # main loop
 print('ready')
 print('stop the program with ctr+c')
-
 
 i = 0
 while True:
@@ -229,20 +232,6 @@ while True:
             last_testing_session = last_measure.testing_session.values[0]
             last_testing = last_measure.testing.values[0]
             last_voltage = last_measure.voltage.values[0]
-            a = 1
-            if voltage < discharged_voltage:
-                a = 1
-
-            # if i > 0:
-            #
-            #     last_testing_session = last_measure.testing_session.values[0]
-            #     last_testing = last_measure.testing.values[0]
-            #     last_voltage = last_measure.voltage.values[0]
-            # else:
-            #     # if we just started the program
-            #     last_testing_session = last_measure.testing_session.values[0] + 1
-            #     last_testing = 0
-            #     last_voltage = voltage
 
             # ============= Case 1 ==================
             # - the preceding voltage was > discharged_voltage
@@ -283,20 +272,6 @@ while True:
                 
                 open_relay(slot_id, slot_infos)
                 last_testing = 0
-
-            # ============= Case 2 ==================
-            # if
-            # - the preceding voltage was < discharged_voltage
-            # - and now the voltage > discharged_voltage
-            # this is the case when we open the relay
-            # the battery should not be under testing, so we don't do anything
-            if (
-                (last_voltage < discharged_voltage)
-                and (voltage > discharged_voltage)
-                and last_testing == 1
-            ):
-                pass
-                # print("case 2, artificial voltage increase in discharged battery, not doing anything")
 
             # ============= Case 3 ============= 
             # if
@@ -350,32 +325,7 @@ while True:
                 else:
                     # print("The battery is discharged, not starting test")
                     pass
-                
-            # ============= Case 5 ============= 
-            # if
-            # - the preceding voltage was 0(+delta)
-            # - and now we still have 0(+delta)
-            # this means that the slot was empty and is still empty
-            if (
-                (last_voltage < voltage_empty_slot)
-                and (voltage < voltage_empty_slot)
-            ):
-                # print("case 5, still empty slot")
-                pass
-                
-            # ============= Case 6 ============= 
-            # if
-            # - the preceding voltage was > 0 and < discharged_voltage
-            # - and now we still have > 0 and < discharged_voltage
-            # this means that the slot is still filled with an empty battery
-            if (
-                (last_voltage > voltage_empty_slot)
-                and (last_voltage < discharged_voltage)
-                and (voltage > voltage_empty_slot)
-                and (voltage < discharged_voltage)
-            ):
-                # print("case 6, still empty battery")
-                pass
+
             timenow = datetime.now()
             slot_measure = pd.Series(
                     data=[timenow, slot_id, voltage, slot_infos[slot_id]['relay_open'], last_testing, last_testing_session],
@@ -384,14 +334,6 @@ while True:
             df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
             
             conn = engine.connect()
-            # dtypes = {
-            #     "time": types.DATETIME(),
-            #     "slot_id": types.INTEGER(),
-            #     "voltage": types.FLOAT(),
-            #     "relay_open": types.BOOLEAN(),
-            #     "testing": types.BOOLEAN(),
-            #     "testing_session": types.INTEGER()
-            # }
             df = pd.DataFrame(slot_measure)
             df[0] = df[0].astype(str)
             df.T.to_sql('measures', conn, if_exists="append", index=False)
