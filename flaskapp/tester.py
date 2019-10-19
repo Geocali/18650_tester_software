@@ -212,7 +212,6 @@ for slot_id in list(slot_infos.keys()):
 print('ready')
 print('stop the program with ctr+c')
 
-
 i = 0
 while True:
     
@@ -229,27 +228,7 @@ while True:
             last_testing_session = last_measure.testing_session.values[0]
             last_testing = last_measure.testing.values[0]
             last_voltage = last_measure.voltage.values[0]
-            a = 1
-            if voltage < discharged_voltage:
-                a = 1
 
-            # if i > 0:
-            #
-            #     last_testing_session = last_measure.testing_session.values[0]
-            #     last_testing = last_measure.testing.values[0]
-            #     last_voltage = last_measure.voltage.values[0]
-            # else:
-            #     # if we just started the program
-            #     last_testing_session = last_measure.testing_session.values[0] + 1
-            #     last_testing = 0
-            #     last_voltage = voltage
-
-            # ============= Case 1 ==================
-            # - the preceding voltage was > discharged_voltage
-            # - and current voltage < discharged_voltage
-            # - and the battery is under testing
-            # we send the conclusions and open the relay
-            # print("-----", last_voltage, voltage, last_testing)
             if (
                 (last_voltage > discharged_voltage)
                 and (voltage <= discharged_voltage)
@@ -283,20 +262,6 @@ while True:
                 
                 open_relay(slot_id, slot_infos)
                 last_testing = 0
-
-            # ============= Case 2 ==================
-            # if
-            # - the preceding voltage was < discharged_voltage
-            # - and now the voltage > discharged_voltage
-            # this is the case when we open the relay
-            # the battery should not be under testing, so we don't do anything
-            if (
-                (last_voltage < discharged_voltage)
-                and (voltage > discharged_voltage)
-                and last_testing == 1
-            ):
-                pass
-                # print("case 2, artificial voltage increase in discharged battery, not doing anything")
 
             # ============= Case 3 ============= 
             # if
@@ -351,18 +316,6 @@ while True:
                     # print("The battery is discharged, not starting test")
                     pass
                 
-            # ============= Case 5 ============= 
-            # if
-            # - the preceding voltage was 0(+delta)
-            # - and now we still have 0(+delta)
-            # this means that the slot was empty and is still empty
-            if (
-                (last_voltage < voltage_empty_slot)
-                and (voltage < voltage_empty_slot)
-            ):
-                # print("case 5, still empty slot")
-                pass
-                
             # ============= Case 6 ============= 
             # if
             # - the preceding voltage was > 0 and < discharged_voltage
@@ -384,14 +337,6 @@ while True:
             df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
             
             conn = engine.connect()
-            # dtypes = {
-            #     "time": types.DATETIME(),
-            #     "slot_id": types.INTEGER(),
-            #     "voltage": types.FLOAT(),
-            #     "relay_open": types.BOOLEAN(),
-            #     "testing": types.BOOLEAN(),
-            #     "testing_session": types.INTEGER()
-            # }
             df = pd.DataFrame(slot_measure)
             df[0] = df[0].astype(str)
             df.T.to_sql('measures', conn, if_exists="append", index=False)
