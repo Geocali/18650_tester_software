@@ -39,26 +39,20 @@ def get_last_battery_measures():
     
     r_data = []
     for slot_id in [1, 2, 3, 4]:
-        df_slot = df_data[df_data.slot_id == slot_id]
         
-        request_last_measure = "SELECT * FROM measures WHERE measures.time = (SELECT MAX(time) FROM measures WHERE measures.slot_id = " + str(float(slot_id)) +")"
-        cursor.execute(request_last_measure)
-        data = []
-        columns = tuple([d[0] for d in cursor.description])
-        for row in cursor:
-            data.append(dict(zip(columns, row)))
-        last_measure = pd.DataFrame(data)
+        request_last_measure = "SELECT * FROM measures WHERE measures.time = (SELECT MAX(time) FROM measures WHERE measures.slot_id = " \
+                               + str(float(slot_id)) \
+                               + ") AND measures.slot_id = " \
+                               + str(float(slot_id))
+        last_measure = pd.read_sql_query(request_last_measure, mariadb_connection)
 
-        # !!!!!!!!!! finish here
-        request_times_last_session = "SELECT * FROM measures WHERE measures.testing_session = " + str(last_measure.testing_session.values[0]) + " AND measures.slot_id = " + str(last_measure.slot_id.values[0])
-        cursor.execute(request_times_last_session)
-        data = []
-        columns = tuple([d[0] for d in cursor.description])
-        for row in cursor:
-            data.append(dict(zip(columns, row)))
-        data_testing = pd.DataFrame(data)
-        
-        tot_mah = 0
+        request_times_last_session = "SELECT * FROM measures WHERE measures.testing_session = " \
+                                     + str(last_measure.testing_session.values[0]) \
+                                     + " AND measures.slot_id = " \
+                                     + str(last_measure.slot_id.values[0]) \
+                                     + " AND measures.testing = 1"
+        data_testing = pd.read_sql_query(request_times_last_session, mariadb_connection)
+
         timediffs = (data_testing.time.diff() / np.timedelta64(1, 'h')).values[1:]
         voltages = data_testing.iloc[1:].voltage.values
         currents = voltages / 4  # R = 4 Ohm
