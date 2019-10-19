@@ -3,3 +3,8 @@ adafruit-circuitpython-busdevice
 adafruit-circuitpython-mcp3xxx
 RPI.GPIO
 adafruit-blinka
+flask
+flask_cors
+mysql
+mysql-connector-python
+pymysql

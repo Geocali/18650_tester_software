@@ -50,3 +50,21 @@ https://pinout.xyz/
 
 # MCP3008
 https://pimylifeup.com/raspberry-pi-adc/
+
+# Run the app
+
+## Setup the database
+sudo apt-get install mariadb-server
+sudo mysql -u root
+use mysql;
+update user set plugin='' where User='root';
+flush privileges;
+\q
+mysql_secure_installation
+mysql -u root -p (caramel)
+CREATE DATABASE battery_schema;
+\q
+
+python3 tester.py
+
+python3 app.py

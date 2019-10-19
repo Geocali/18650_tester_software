@@ -239,6 +239,7 @@ while True:
             # - and the battery is under testing
             # we send the conclusions and open the relay
             # print("-----", last_voltage, voltage, last_testing)
+
             if (
                 (last_voltage > discharged_voltage)
                 and (voltage <= discharged_voltage)
@@ -312,7 +313,7 @@ while True:
                     last_testing_session = result.values[0][0]
                 else:
                     last_testing_session = slot_id
-                last_testing_session = last_testing_session + 1
+                last_testing_session = float(last_testing_session) + 1
                 
                 if voltage > min_charged_voltage:
                     print("The battery is charged, starting test")
@@ -325,7 +326,20 @@ while True:
                 else:
                     # print("The battery is discharged, not starting test")
                     pass
-
+                
+            # ============= Case 6 ============= 
+            # if
+            # - the preceding voltage was > 0 and < discharged_voltage
+            # - and now we still have > 0 and < discharged_voltage
+            # this means that the slot is still filled with an empty battery
+            if (
+                (last_voltage > voltage_empty_slot)
+                and (last_voltage < discharged_voltage)
+                and (voltage > voltage_empty_slot)
+                and (voltage < discharged_voltage)
+            ):
+                # print("case 6, still empty battery")
+                pass
             timenow = datetime.now()
             slot_measure = pd.Series(
                     data=[timenow, slot_id, voltage, slot_infos[slot_id]['relay_open'], last_testing, last_testing_session],
