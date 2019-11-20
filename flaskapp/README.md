@@ -65,6 +65,8 @@ mysql -u root -p (caramel)
 CREATE DATABASE battery_schema;
 \q
 
+## Start the script that manages the testing of the batteries
 python3 tester.py
 
+## Start the Flask API
 python3 app.py
