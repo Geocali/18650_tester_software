@@ -19,6 +19,7 @@ pandas = "*"
 requests = "*"
 urllib3 = "*"
 sqlalchemy = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.7"

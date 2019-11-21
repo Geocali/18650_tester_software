@@ -1,10 +1,11 @@
 
 try:
     import RPi.GPIO as GPIO
-
     import board
+    SIMULATION = False
 except:
-    pass
+
+    SIMULATION = True
 
 
 import busio
@@ -15,68 +16,14 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 
 import time
 from datetime import datetime
-
-
-def close_relay(batt_id, batt_infos):
-    # ==== close the relay ====
-    RELAY_GPIO = batt_infos[batt_id]["relay_gpio"]
-    # GPIO Assign mode
-    GPIO.setup(RELAY_GPIO, GPIO.OUT)
-    # close the relay
-    GPIO.output(RELAY_GPIO, GPIO.LOW)
-    return
-
-
-def open_relay(batt_id, batt_infos):
-    # ==== close the relay ====
-    RELAY_GPIO = batt_infos[batt_id]["relay_gpio"]
-    # GPIO Assign mode
-    GPIO.setup(RELAY_GPIO, GPIO.OUT)
-    # close the relay
-    GPIO.output(RELAY_GPIO, GPIO.HIGH)
-    return
-
-
-def read_voltage(batt_id, batt_infos, mcp):
-    # create a differential ADC channel between Pin 0 and Pin 1
-    pin0 = batt_infos[batt_id]["mcp_pin0"]
-    pin1 = batt_infos[batt_id]["mcp_pin1"]
-    return AnalogIn(mcp, pin0, pin1).voltage
-
-
-def read_all_voltages_t(batt_infos, mcp):
-    for batt_id in list(batt_infos.keys()):
-        close_relay(batt_id, batt_infos)
-        time.sleep(0.1)
-        voltage = read_voltage(batt_id, batt_infos, mcp)
-        open_relay(batt_id, batt_infos)
-        print('Voltage batt ' + str(batt_id) + ": " + str(voltage) + 'V')
-
-
-def set_up_conf():
-    GPIO.setmode(GPIO.BCM)  # GPIO Numbers instead of board numbers
-
-    # ==== MCP3008 hardware SPI configuration ====
-    spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
-    # create the cs (chip select)
-    cs = digitalio.DigitalInOut(board.CE0)
-    # create the mcp object (harware option)
-    mcp = MCP.MCP3008(spi, cs)
-
-    batt_infos = {
-        1: {"relay_gpio": 5, "mcp_pin0": MCP.P0, "mcp_pin1": MCP.P1},
-        2: {"relay_gpio": 6, "mcp_pin0": MCP.P2, "mcp_pin1": MCP.P3},
-        3: {"relay_gpio": 13, "mcp_pin0": MCP.P4, "mcp_pin1": MCP.P5},
-        4: {"relay_gpio": 19, "mcp_pin0": MCP.P6, "mcp_pin1": MCP.P7}
-    }
-
-    return mcp, batt_infos
+import numpy as np
 
 
 class Battery:
     def __init__(self, tester_slot):
         self.tester_slot = tester_slot
         self.voltages_history = []
+        self.tested_capacity = None
 
 
 class BatteriesTester:
@@ -88,15 +35,22 @@ class BatteriesTester:
             3: {"relay_gpio": 13, "mcp_pin0": MCP.P4, "mcp_pin1": MCP.P5},
             4: {"relay_gpio": 19, "mcp_pin0": MCP.P6, "mcp_pin1": MCP.P7}
         }
+        self.history = []
+        self.setup()
+        self.R = 4 # Ohm
 
-        GPIO.setmode(GPIO.BCM)  # GPIO Numbers instead of board numbers
+    def setup(self):
+        if not SIMULATION:
+            GPIO.setmode(GPIO.BCM)  # GPIO Numbers instead of board numbers
 
-        # ==== MCP3008 hardware SPI configuration ====
-        spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
-        # create the cs (chip select)
-        cs = digitalio.DigitalInOut(board.CE0)
-        # create the mcp object (harware option)
-        self.mcp = MCP.MCP3008(spi, cs)
+            # ==== MCP3008 hardware SPI configuration ====
+            spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
+            # create the cs (chip select)
+            cs = digitalio.DigitalInOut(board.CE0)
+            # create the mcp object (harware option)
+            self.mcp = MCP.MCP3008(spi, cs)
+        else:
+            pass
 
     def close_relay(self, battery):
         # ==== close the relay ====
@@ -107,6 +61,7 @@ class BatteriesTester:
         GPIO.output(RELAY_GPIO, GPIO.LOW)
         # we need some time between the actions of the different relays
         time.sleep(0.5)
+        self.history.append({'time': datetime.now(), 'operation': 'close_relay', 'battery': battery.tester_slot, 'value': None})
         return
 
     def open_relay(self, battery):
@@ -118,6 +73,7 @@ class BatteriesTester:
         GPIO.output(RELAY_GPIO, GPIO.HIGH)
         # we need some time between the actions of the different relays
         time.sleep(0.5)
+        self.history.append({'time': datetime.now(), 'operation': 'open_relay', 'battery': battery.tester_slot, 'value': None})
         return
 
     def read_voltage(self, battery):
@@ -126,8 +82,27 @@ class BatteriesTester:
         pin1 = self.map_slots[battery.tester_slot]['mcp_pin0']
         voltage = AnalogIn(self.mcp, pin0, pin1).voltage
         battery.voltages_history.append([datetime.now(), voltage])
-
+        self.history.append({'time': datetime.now(), 'operation': 'read_voltage', 'battery': battery.tester_slot, 'value': voltage})
         return voltage
+
+
+def manage(batteries_tester, batteries):
+
+    # close all the relays
+    for battery in batteries:
+        batteries_tester.close_relay(battery)
+
+    i = 0
+    while i < 100:
+        for battery in batteries:
+            voltage = batteries_tester.read_voltage(battery)
+
+            if voltage < 3:
+                batteries_tester.open_relay(battery)
+                battery.tested_capacity = sum(np.array(battery.voltages_history)[:,1]) / batteries_tester.R
+
+        i += 1
+    return
 
 
 if __name__ == "__main__":
@@ -136,9 +111,7 @@ if __name__ == "__main__":
 
     batteries_tester = BatteriesTester()
 
-    # close all the relays
-    for battery in batteries:
-        batteries_tester.close_relay(battery)
+    manage(batteries_tester, batteries)
 
 
 
