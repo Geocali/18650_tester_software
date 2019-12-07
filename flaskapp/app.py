@@ -16,8 +16,15 @@ csv_file = "output/measures.csv"
 def create_plot():
 
     df = pd.read_csv(csv_file)
+
     df_slot1 = df[df.slot_id == 1]
     df1 = df_slot1[df_slot1.testing_session == df_slot1.testing_session.max()]
+    df_slot2 = df[df.slot_id == 2]
+    df2 = df_slot2[df_slot2.testing_session == df_slot2.testing_session.max()]
+    df_slot3 = df[df.slot_id == 3]
+    df3 = df_slot3[df_slot3.testing_session == df_slot3.testing_session.max()]
+    df_slot4 = df[df.slot_id == 4]
+    df4 = df_slot4[df_slot4.testing_session == df_slot4.testing_session.max()]
 
     fig = make_subplots(rows=2, cols=2, subplot_titles=("Slot 1", "Slot 2", "Slot 3", "Slot 4"))
     fig.add_trace(
@@ -50,23 +57,48 @@ def create_plot():
     )
     fig.update_layout(height=800, width=1000, title_text="Batteries")
 
-
     fig['layout'].update(
         annotations=[
         dict(
-            x=df[df.slot_id == 1].time.values[-1], y=df[df.slot_id == 1].spent_mah.values[-1] + 'mAh', # annotation point
+            x=df1.time.values[-1], y=df1.voltage.values[-1], # annotation point
             xref='x1', 
             yref='y1',
-            text='dict Text',
+            text=str(df1.spent_mah.values[-1]) + 'mAh',
             showarrow=True,
             arrowhead=7,
             ax=10,
             ay=70
         ),
-        # dict(
-        #     ...
-        #     # if have multiple annotations
-        # )
+        dict(
+            x=df2.time.values[-1], y=df2.voltage.values[-1], # annotation point
+            xref='x2', 
+            yref='y2',
+            text=str(df2.spent_mah.values[-1]) + 'mAh',
+            showarrow=True,
+            arrowhead=7,
+            ax=10,
+            ay=70
+        ),
+        dict(
+            x=df3.time.values[-1], y=df3.voltage.values[-1], # annotation point
+            xref='x3', 
+            yref='y3',
+            text=str(df3.spent_mah.values[-1]) + 'mAh',
+            showarrow=True,
+            arrowhead=7,
+            ax=10,
+            ay=70
+        ),
+        dict(
+            x=df4.time.values[-1], y=df4.voltage.values[-1], # annotation point
+            xref='x4', 
+            yref='y4',
+            text=str(df4.spent_mah.values[-1]) + 'mAh',
+            showarrow=True,
+            arrowhead=7,
+            ax=10,
+            ay=70
+        ),
     ])
 
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)

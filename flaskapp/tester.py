@@ -232,6 +232,7 @@ while True:
             last_testing = last_measure.testing.values[0]
             last_voltage = float(last_measure.voltage.values[0])
             last_mah = float(last_measure.spent_mah.values[0])
+            mah = 0
             
             # ============= Case 1 ==================
             # - the preceding voltage was > discharged_voltage
@@ -344,7 +345,8 @@ while True:
                 # print("case 6, still empty battery")
                 pass
 
-            mah = last_mah + voltage / R / 3600 / (delta_t * 1000)
+            if last_testing == 1:
+                mah = str(round(last_mah + voltage / R / 3600 / 1000 * delta_t, 3))
             timenow = datetime.now()
             voltage = str(round(voltage, 3))
             
