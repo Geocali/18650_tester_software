@@ -8,3 +8,5 @@ flask_cors
 mysql
 mysql-connector-python
 pymysql
+pandas
+ptvsd

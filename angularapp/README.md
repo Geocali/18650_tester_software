@@ -28,11 +28,13 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 
 # Mariadb
+```
 sudo mysql -u root -p
 root : caramel
-
+```
 
 # install on raspberry
+```
 sudo apt-get update
 sudo apt-get dist-upgrade
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
@@ -45,4 +47,5 @@ sudo apt-get install -y nodejs
 sudo npm install -g @angular/cli
 cd ~/prog/rpy_battery_tester/angularapp
 npm install
-ng serve
+ng serve --host 0.0.0.0
+```
