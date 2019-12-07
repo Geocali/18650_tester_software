@@ -138,6 +138,7 @@ def read_all_voltages_t(slot_infos, mcp):
 
 
 def relays_initialization(slot_infos, mcp, csv_file):
+    mah = 0
     # close all the relays of the slots containing a charged battery
     df_slots_history = pd.DataFrame()
     for slot_id in list(slot_infos.keys()):
@@ -151,8 +152,8 @@ def relays_initialization(slot_infos, mcp, csv_file):
         else:
             testing_session = 0
         slot_measure = pd.Series(
-            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, testing_session],
-            index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
+            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, testing_session, mah],
+            index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session', 'spent_mah']
         )
         df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
 
@@ -162,9 +163,10 @@ def relays_initialization(slot_infos, mcp, csv_file):
 
             # we record it (we read the voltage again, in case the relay is closed)
             voltage = read_voltage(slot_id, slot_infos, mcp)
+            
             slot_measure = pd.Series(
-                data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, testing_session],
-                index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
+                data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, testing_session, mah],
+                index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session', 'spent_mah']
             )
 
             df = pd.DataFrame(slot_measure)
@@ -228,7 +230,8 @@ while True:
             last_measure = df_slots_history[df_slots_history.slot_id == slot_id].tail(1)
             last_testing_session = last_measure.testing_session.values[0]
             last_testing = last_measure.testing.values[0]
-            last_voltage = last_measure.voltage.values[0]
+            last_voltage = float(last_measure.voltage.values[0])
+            last_mah = float(last_measure.spent_mah.values[0])
             
             # ============= Case 1 ==================
             # - the preceding voltage was > discharged_voltage
@@ -340,11 +343,14 @@ while True:
             ):
                 # print("case 6, still empty battery")
                 pass
+
+            mah = last_mah + voltage / R / 3600 / (delta_t * 1000)
             timenow = datetime.now()
             voltage = str(round(voltage, 3))
+            
             slot_measure = pd.Series(
-                    data=[timenow, slot_id, voltage, slot_infos[slot_id]['relay_open'], last_testing, last_testing_session],
-                    index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
+                    data=[timenow, slot_id, voltage, slot_infos[slot_id]['relay_open'], last_testing, last_testing_session, mah],
+                    index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session', 'spent_mah']
                 )
             df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
             

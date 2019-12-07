@@ -10,3 +10,4 @@ mysql-connector-python
 pymysql
 pandas
 ptvsd
+plotly
