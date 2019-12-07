@@ -5,7 +5,7 @@ import requests
 import urllib3
 import sys
 import creds
-from sqlalchemy import create_engine, types
+import os.path
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -87,12 +87,6 @@ except RuntimeError:
                 voltage_start = 4.2 - delta * i
             elif slot_id == 4:
                 voltage_start = 4.25 - delta * i
-        # else:
-        #     conn = engine.connect()
-        #     df = pd.read_sql_query("SELECT * FROM measures", conn)
-        #     conn.close()
-        #     df_curr = df[(df.slot_id == slot_id) & (df.testing_session == df.testing_session.max())]
-        #     voltage_start = df_curr.tail(1).voltage.values[0] - 0.05
 
         # infos for this slot and last testing session
         class AnalogInclass:
@@ -142,7 +136,8 @@ def read_all_voltages_t(slot_infos, mcp):
         open_relay(slot_id, slot_infos)
         print('Voltage batt ' + str(slot_id) + ": " + str(voltage) + 'V')
 
-def relays_initialization(slot_infos, mcp, engine):
+
+def relays_initialization(slot_infos, mcp, csv_file):
     # close all the relays of the slots containing a charged battery
     df_slots_history = pd.DataFrame()
     for slot_id in list(slot_infos.keys()):
@@ -150,7 +145,11 @@ def relays_initialization(slot_infos, mcp, engine):
         voltage = read_voltage(slot_id, slot_infos, mcp)
 
         # we record it
-        testing_session = 0
+        if os.path.isfile(csv_file):
+            df = pd.read_csv(csv_file)
+            testing_session = int(df[df.slot_id == slot_id].testing_session.values[-1])
+        else:
+            testing_session = 0
         slot_measure = pd.Series(
             data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, testing_session],
             index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
@@ -168,47 +167,12 @@ def relays_initialization(slot_infos, mcp, engine):
                 index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
             )
 
-            conn = engine.connect()
             df = pd.DataFrame(slot_measure)
             df[0] = df[0].astype(str)
-            df.T.to_sql('measures', conn, if_exists="append", index=False)
-            conn.close()
-
-            df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
-    return df_slots_history
-
-
-def relays_initialization(slot_infos, mcp, engine):
-    # close all the relays of the slots containing a charged battery
-    df_slots_history = pd.DataFrame()
-    for slot_id in list(slot_infos.keys()):
-        open_relay(slot_id, slot_infos)
-        voltage = read_voltage(slot_id, slot_infos, mcp)
-
-        # we record it
-        testing_session = 0
-        slot_measure = pd.Series(
-            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, testing_session],
-            index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
-        )
-        df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
-
-        # if the battery is charged, we test it
-        if voltage > min_charged_voltage:
-            close_relay(slot_id, slot_infos)
-
-            # we record it (we read the voltage again, in case the relay is closed)
-            voltage = read_voltage(slot_id, slot_infos, mcp)
-            slot_measure = pd.Series(
-                data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, testing_session],
-                index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
-            )
-
-            conn = engine.connect()
-            df = pd.DataFrame(slot_measure)
-            df[0] = df[0].astype(str)
-            df.T.to_sql('measures', conn, if_exists="append", index=False)
-            conn.close()
+            if os.path.isfile(csv_file):
+                df.T.to_csv(csv_file, mode='a', header=False, index=False)
+            else:
+                df.T.to_csv(csv_file, index=False)
 
             df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
     return df_slots_history
@@ -242,10 +206,8 @@ voltage_empty_slot = 1
 # time between measures
 delta_t = 10  # seconds
 
-engine = create_engine("sqlite:///output/measures.db")
-engine = create_engine("mysql+pymysql://root:caramel@localhost:3306/battery_schema")
-
-df_slots_history = relays_initialization(slot_infos, mcp, engine)
+csv_file = 'output/measures.csv'
+df_slots_history = relays_initialization(slot_infos, mcp, csv_file)
 
 # main loop
 print('ready')
@@ -350,11 +312,7 @@ while True:
             ):
                 
                 # print("case 4, a battery was inserted")
-                result = pd.read_sql_query("SELECT ROUND(MAX(CAST(testing_session AS DECIMAL(4, 3)))) FROM measures", engine)
-                if result.values[0][0] is not None:
-                    last_testing_session = result.values[0][0]
-                else:
-                    last_testing_session = slot_id
+
                 last_testing_session = float(last_testing_session) + 1
                 
                 if voltage > min_charged_voltage:
@@ -383,17 +341,20 @@ while True:
                 # print("case 6, still empty battery")
                 pass
             timenow = datetime.now()
+            voltage = str(round(voltage, 3))
             slot_measure = pd.Series(
                     data=[timenow, slot_id, voltage, slot_infos[slot_id]['relay_open'], last_testing, last_testing_session],
                     index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session']
                 )
             df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
             
-            conn = engine.connect()
             df = pd.DataFrame(slot_measure)
             df[0] = df[0].astype(str)
-            df.T.to_sql('measures', conn, if_exists="append", index=False)
-            conn.close()
+
+            if os.path.isfile(csv_file):
+                df.T.to_csv(csv_file, mode='a', header=False, index=False)
+            else:
+                df.T.to_csv(csv_file, index=False)
 
             if last_testing == 1:
                 print('batt ' + str(slot_id) + ": " + str(last_voltage) + "/" + str(voltage))
@@ -403,7 +364,6 @@ while True:
     except KeyboardInterrupt:
         for slot_id in list(slot_infos.keys()):
             open_relay(slot_id, slot_infos)
-        conn.close()
-        engine.dispose()
+
         sys.exit()
 
