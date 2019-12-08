@@ -5,9 +5,6 @@ RPI.GPIO
 adafruit-blinka
 flask
 flask_cors
-mysql
-mysql-connector-python
-pymysql
 pandas
 ptvsd
 plotly
