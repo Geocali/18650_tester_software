@@ -27,35 +27,225 @@ def create_plot():
     df4 = df_slot4[df_slot4.testing_session == df_slot4.testing_session.max()]
 
     fig = make_subplots(rows=2, cols=2, subplot_titles=("Slot 1", "Slot 2", "Slot 3", "Slot 4"))
+    
+    # ========== slot 1 ============
     fig.add_trace(
         go.Scatter(
             x=df1['time'], # assign x as the dataframe column 'x'
-            y=df1['voltage']
+            y=df1['voltage'],
+            name='voltage slot 1',
+            line=dict(color='royalblue', width=2)
         ),
         row=1, col=1
     )
     fig.add_trace(
         go.Scatter(
+            x=df1.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            y=[3, 3],
+            mode='lines',
+            name='end test voltage',
+            line=dict(color='black', width=2)
+        ),
+        row=1, col=1
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df1.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            y=[4, 4],
+            mode='lines',
+            name='start test voltage',
+            line=dict(color='black', width=2)
+        ),
+        row=1, col=1
+    )
+    if df1[df1.testing == 1].shape[0] > 0:
+        t_start_test = df1[df1.testing == 1].iloc[0].time
+        t_end_test = df1[df1.testing == 1].iloc[-1].time
+        fig.add_shape(
+            # filled Rectangle
+            go.layout.Shape(
+                type="rect",
+                x0=t_start_test,
+                y0=3,
+                x1=t_end_test,
+                y1=4,
+                line=dict(
+                    color="RoyalBlue",
+                    width=2,
+                ),
+                fillcolor="LightSkyBlue",
+                            opacity=0.5,
+                layer="below",
+                line_width=0,
+            ),
+            row=1, col=1
+            )
+        fig.update_shapes(dict(xref='x', yref='y'))
+
+    # =========== slot 2 ==============
+    fig.add_trace(
+        go.Scatter(
             x=df[df.slot_id == 2]['time'], # assign x as the dataframe column 'x'
-            y=df[df.slot_id == 2]['voltage']
+            y=df[df.slot_id == 2]['voltage'],
+            name="voltage slot 2",
+            line=dict(color='royalblue', width=2)
         ),
         row=1, col=2
     )
     fig.add_trace(
         go.Scatter(
+            x=df2.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            y=[3, 3],
+            mode='lines',
+            name='end test voltage',
+            line=dict(color='black', width=2)
+        ),
+        row=1, col=2
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df2.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            y=[4, 4],
+            mode='lines',
+            name='start test voltage',
+            line=dict(color='black', width=2)
+        ),
+        row=1, col=2
+    )
+    if df2[df2.testing == 1].shape[0] > 0:
+        t_start_test = df2[df2.testing == 1].iloc[0].time
+        t_end_test = df2[df2.testing == 1].iloc[-1].time
+        fig.add_shape(
+            # filled Rectangle
+            go.layout.Shape(
+                type="rect",
+                x0=t_start_test,
+                y0=3,
+                x1=t_end_test,
+                y1=4,
+                line=dict(
+                    color="RoyalBlue",
+                    width=2,
+                ),
+                fillcolor="LightSkyBlue",
+                            opacity=0.5,
+                layer="below",
+                line_width=0,
+            ),
+            row=1, col=2
+            )
+        fig.update_shapes(dict(xref='x', yref='y'))
+
+    # ========= slot 3 =========
+    fig.add_trace(
+        go.Scatter(
             x=df[df.slot_id == 3]['time'], # assign x as the dataframe column 'x'
-            y=df[df.slot_id == 3]['voltage']
+            y=df[df.slot_id == 3]['voltage'],
+            name="voltage slot 3",
+            line=dict(color='royalblue', width=2)
         ),
         row=2, col=1
     )
     fig.add_trace(
         go.Scatter(
+            x=df3.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            y=[3, 3],
+            mode='lines',
+            name='end test voltage',
+            line=dict(color='black', width=2)
+        ),
+        row=2, col=1
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df3.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            y=[4, 4],
+            mode='lines',
+            name='start test voltage',
+            line=dict(color='black', width=2)
+        ),
+        row=2, col=1
+    )
+    if df3[df3.testing == 1].shape[0] > 0:
+        t_start_test = df3[df3.testing == 1].iloc[0].time
+        t_end_test = df3[df3.testing == 1].iloc[-1].time
+        fig.add_shape(
+            # filled Rectangle
+            go.layout.Shape(
+                type="rect",
+                x0=t_start_test,
+                y0=3,
+                x1=t_end_test,
+                y1=4,
+                line=dict(
+                    color="RoyalBlue",
+                    width=2,
+                ),
+                fillcolor="LightSkyBlue",
+                            opacity=0.5,
+                layer="below",
+                line_width=0,
+            ),
+            row=2, col=1
+            )
+        fig.update_shapes(dict(xref='x', yref='y'))
+
+    # ========== slot 4 ===========
+    fig.add_trace(
+        go.Scatter(
             x=df[df.slot_id == 4]['time'], # assign x as the dataframe column 'x'
-            y=df[df.slot_id == 4]['voltage']
+            y=df[df.slot_id == 4]['voltage'],
+            name="voltage slot 4",
+            line=dict(color='royalblue', width=2)
         ),
         row=2, col=2
     )
-    fig.update_layout(height=800, width=1000, title_text="Batteries")
+    fig.add_trace(
+        go.Scatter(
+            x=df4.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            y=[3, 3],
+            mode='lines',
+            name='end test voltage',
+            line=dict(color='black', width=2)
+        ),
+        row=2, col=2
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df4.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            y=[4, 4],
+            mode='lines',
+            name='start test voltage',
+            line=dict(color='black', width=2)
+        ),
+        row=2, col=2
+    )
+    if df4[df4.testing == 1].shape[0] > 0:
+        t_start_test = df4[df4.testing == 1].iloc[0].time
+        t_end_test = df4[df4.testing == 1].iloc[-1].time
+        fig.add_shape(
+            # filled Rectangle
+            go.layout.Shape(
+                type="rect",
+                x0=t_start_test,
+                y0=3,
+                x1=t_end_test,
+                y1=4,
+                line=dict(
+                    color="RoyalBlue",
+                    width=2,
+                ),
+                fillcolor="LightSkyBlue",
+                            opacity=0.5,
+                layer="below",
+                line_width=0,
+            ),
+            row=2, col=2
+            )
+        fig.update_shapes(dict(xref='x', yref='y'))
+
+
+    fig.update_layout(height=800, width=1000, title_text="Batteries", showlegend=False)
 
     fig['layout'].update(
         annotations=[
