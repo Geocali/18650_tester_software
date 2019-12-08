@@ -359,10 +359,11 @@ while True:
             df = pd.DataFrame(slot_measure)
             df[0] = df[0].astype(str)
 
-            if os.path.isfile(csv_file):
-                df.T.to_csv(csv_file, mode='a', header=False, index=False)
-            else:
-                df.T.to_csv(csv_file, index=False)
+            if not ( (float(voltage) < voltage_empty_slot) and (last_voltage < voltage_empty_slot) ):
+                if os.path.isfile(csv_file):
+                    df.T.to_csv(csv_file, mode='a', header=False, index=False)
+                else:
+                    df.T.to_csv(csv_file, index=False)
 
             if last_testing == 1:
                 print('batt ' + str(slot_id) + ": " + str(last_voltage) + "/" + str(voltage))
