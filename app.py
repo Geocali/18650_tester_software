@@ -6,6 +6,7 @@ import json
 import plotly
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
+import os
 
 from flask_cors import CORS
 
@@ -15,7 +16,10 @@ csv_file = "output/measures.csv"
 
 def create_plot():
 
-    df = pd.read_csv(csv_file)
+    if not os.path.isfile(csv_file):
+        df = pd.DataFrame(columns=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session', 'spent_mah'])
+    else:
+        df = pd.read_csv(csv_file)
 
     df_slot1 = df[df.slot_id == 1]
     df1 = df_slot1[df_slot1.testing_session == df_slot1.testing_session.max()]
@@ -40,7 +44,7 @@ def create_plot():
     )
     fig.add_trace(
         go.Scatter(
-            x=df1.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            x=pd.concat([df1.head(1), df1.tail(1)])['time'], # assign x as the dataframe column 'x'
             y=[3, 3],
             mode='lines',
             name='end test voltage',
@@ -50,7 +54,7 @@ def create_plot():
     )
     fig.add_trace(
         go.Scatter(
-            x=df1.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            x=pd.concat([df1.head(1), df1.tail(1)])['time'], # assign x as the dataframe column 'x'
             y=[4, 4],
             mode='lines',
             name='start test voltage',
@@ -94,7 +98,7 @@ def create_plot():
     )
     fig.add_trace(
         go.Scatter(
-            x=df2.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            x=pd.concat([df2.head(1), df2.tail(1)])['time'], # assign x as the dataframe column 'x'
             y=[3, 3],
             mode='lines',
             name='end test voltage',
@@ -104,7 +108,7 @@ def create_plot():
     )
     fig.add_trace(
         go.Scatter(
-            x=df2.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            x=pd.concat([df2.head(1), df2.tail(1)])['time'], # assign x as the dataframe column 'x'
             y=[4, 4],
             mode='lines',
             name='start test voltage',
@@ -148,7 +152,7 @@ def create_plot():
     )
     fig.add_trace(
         go.Scatter(
-            x=df3.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            x=pd.concat([df3.head(1), df3.tail(1)])['time'], # assign x as the dataframe column 'x'
             y=[3, 3],
             mode='lines',
             name='end test voltage',
@@ -158,7 +162,7 @@ def create_plot():
     )
     fig.add_trace(
         go.Scatter(
-            x=df3.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            x=pd.concat([df3.head(1), df3.tail(1)])['time'], # assign x as the dataframe column 'x'
             y=[4, 4],
             mode='lines',
             name='start test voltage',
@@ -202,7 +206,7 @@ def create_plot():
     )
     fig.add_trace(
         go.Scatter(
-            x=df4.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            x=pd.concat([df4.head(1), df4.tail(1)])['time'], # assign x as the dataframe column 'x'
             y=[3, 3],
             mode='lines',
             name='end test voltage',
@@ -212,7 +216,7 @@ def create_plot():
     )
     fig.add_trace(
         go.Scatter(
-            x=df4.iloc[[0, -1]]['time'], # assign x as the dataframe column 'x'
+            x=pd.concat([df4.head(1), df4.tail(1)])['time'], # assign x as the dataframe column 'x'
             y=[4, 4],
             mode='lines',
             name='start test voltage',
@@ -247,48 +251,65 @@ def create_plot():
 
     fig.update_layout(height=800, width=1000, title_text="Batteries", showlegend=False)
 
-    fig['layout'].update(
-        annotations=[
-        dict(
-            x=df1.time.values[-1], y=df1.voltage.values[-1], # annotation point
+    if df1.shape[0] == 0:
+        dict1 = {}
+    else:
+        dict1 = dict(
+            x=df1.tail(1).time.values[0], y=df1.tail(1).voltage.values[0], # annotation point
             xref='x1', 
             yref='y1',
-            text=str(df1.spent_mah.values[-1]) + 'mAh',
+            text=str(df1.tail(1).spent_mah.values[0]) + 'mAh',
             showarrow=True,
             arrowhead=7,
             ax=10,
             ay=70
-        ),
-        dict(
-            x=df2.time.values[-1], y=df2.voltage.values[-1], # annotation point
+        )
+    if df2.shape[0] == 0:
+        dict2 = {}
+    else:
+        dict2 = dict(
+            x=df2.tail(1).time.values[0], y=df2.tail(1).voltage.values[0], # annotation point
             xref='x2', 
             yref='y2',
-            text=str(df2.spent_mah.values[-1]) + 'mAh',
+            text=str(df2.tail(1).spent_mah.values[0]) + 'mAh',
             showarrow=True,
             arrowhead=7,
             ax=10,
             ay=70
-        ),
-        dict(
-            x=df3.time.values[-1], y=df3.voltage.values[-1], # annotation point
+        )
+    if df3.shape[0] == 0:
+        dict3 = {}
+    else:
+        dict3 = dict(
+            x=df3.tail(1).time.values[0], y=df3.tail(1).voltage.values[0], # annotation point
             xref='x3', 
             yref='y3',
-            text=str(df3.spent_mah.values[-1]) + 'mAh',
+            text=str(df3.tail(1).spent_mah.values[0]) + 'mAh',
             showarrow=True,
             arrowhead=7,
             ax=10,
             ay=70
-        ),
-        dict(
-            x=df4.time.values[-1], y=df4.voltage.values[-1], # annotation point
+        )
+    if df4.shape[0] == 0:
+        dict4 = {}
+    else:
+        dict4 = dict(
+            x=df4.tail(1).time.values[0], y=df4.tail(1).voltage.values[0], # annotation point
             xref='x4', 
             yref='y4',
-            text=str(df4.spent_mah.values[-1]) + 'mAh',
+            text=str(df4.tail(1).spent_mah.values[0]) + 'mAh',
             showarrow=True,
             arrowhead=7,
             ax=10,
             ay=70
-        ),
+        )
+
+    fig['layout'].update(
+        annotations=[
+        dict1,
+        dict2,
+        dict3,
+        dict4
     ])
 
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
