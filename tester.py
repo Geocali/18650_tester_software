@@ -265,8 +265,8 @@ while True:
                     & (df_slots_history.testing_session == last_testing_session)
                     & (df_slots_history.testing == True)
                 ]
-                battery_capacity = df_testing_session.voltage.sum() / R / 3600 / 1000
-                print('battery ' + str(slot_id) + ' tested at ' + str(battery_capacity) + ' mAh')
+                battery_capacity = df_testing_session.spent_mah.max()
+                print('battery ' + str(slot_id) + ' tested at ' + str(round(battery_capacity, 0)) + ' mAh')
                 
                 # export to file
                 filename = str(datetime.now())[0:19].replace(":", "") + "_" + str(slot_id) + "_" + str(int(last_testing_session)) + "_" + str(int(battery_capacity)) + "mAh.csv"
