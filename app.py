@@ -17,7 +17,7 @@ csv_file = "output/measures.csv"
 def create_plot():
 
     if not os.path.isfile(csv_file):
-        df = pd.DataFrame(columns=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session', 'spent_mah'])
+        df = pd.DataFrame(columns=['time', 'slot_id', 'voltage', 'testing', 'testing_session', 'spent_mah'])
     else:
         df = pd.read_csv(csv_file)
 
@@ -62,9 +62,9 @@ def create_plot():
         ),
         row=1, col=1
     )
-    if df1[df1.testing == 1].shape[0] > 0:
-        t_start_test = df1[df1.testing == 1].iloc[0].time
-        t_end_test = df1[df1.testing == 1].iloc[-1].time
+    if df1[df1.testing == True].shape[0] > 0:
+        t_start_test = df1[df1.testing == True].iloc[0].time
+        t_end_test = df1[df1.testing == True].iloc[-1].time
         fig.add_shape(
             # filled Rectangle
             go.layout.Shape(
@@ -84,13 +84,13 @@ def create_plot():
             ),
             row=1, col=1
             )
-        fig.update_shapes(dict(xref='x', yref='y'))
+        fig.update_shapes(dict(xref='x1', yref='y1'))
 
     # =========== slot 2 ==============
     fig.add_trace(
         go.Scatter(
-            x=df[df.slot_id == 2]['time'], # assign x as the dataframe column 'x'
-            y=df[df.slot_id == 2]['voltage'],
+            x=df2['time'], # assign x as the dataframe column 'x'
+            y=df2['voltage'],
             name="voltage slot 2",
             line=dict(color='royalblue', width=2)
         ),
@@ -116,9 +116,9 @@ def create_plot():
         ),
         row=1, col=2
     )
-    if df2[df2.testing == 1].shape[0] > 0:
-        t_start_test = df2[df2.testing == 1].iloc[0].time
-        t_end_test = df2[df2.testing == 1].iloc[-1].time
+    if df2[df2.testing == True].shape[0] > 0:
+        t_start_test = df2[df2.testing == True].iloc[0].time
+        t_end_test = df2[df2.testing == True].iloc[-1].time
         fig.add_shape(
             # filled Rectangle
             go.layout.Shape(
@@ -138,13 +138,13 @@ def create_plot():
             ),
             row=1, col=2
             )
-        fig.update_shapes(dict(xref='x', yref='y'))
+        fig.update_shapes(dict(xref='x2', yref='y2'))
 
     # ========= slot 3 =========
     fig.add_trace(
         go.Scatter(
-            x=df[df.slot_id == 3]['time'], # assign x as the dataframe column 'x'
-            y=df[df.slot_id == 3]['voltage'],
+            x=df3['time'], # assign x as the dataframe column 'x'
+            y=df3['voltage'],
             name="voltage slot 3",
             line=dict(color='royalblue', width=2)
         ),
@@ -170,9 +170,9 @@ def create_plot():
         ),
         row=2, col=1
     )
-    if df3[df3.testing == 1].shape[0] > 0:
-        t_start_test = df3[df3.testing == 1].iloc[0].time
-        t_end_test = df3[df3.testing == 1].iloc[-1].time
+    if df3[df3.testing == True].shape[0] > 0:
+        t_start_test = df3[df3.testing == True].iloc[0].time
+        t_end_test = df3[df3.testing == True].iloc[-1].time
         fig.add_shape(
             # filled Rectangle
             go.layout.Shape(
@@ -192,13 +192,13 @@ def create_plot():
             ),
             row=2, col=1
             )
-        fig.update_shapes(dict(xref='x', yref='y'))
+        fig.update_shapes(dict(xref='x3', yref='y3'))
 
     # ========== slot 4 ===========
     fig.add_trace(
         go.Scatter(
-            x=df[df.slot_id == 4]['time'], # assign x as the dataframe column 'x'
-            y=df[df.slot_id == 4]['voltage'],
+            x=df4['time'], # assign x as the dataframe column 'x'
+            y=df4['voltage'],
             name="voltage slot 4",
             line=dict(color='royalblue', width=2)
         ),
@@ -224,9 +224,9 @@ def create_plot():
         ),
         row=2, col=2
     )
-    if df4[df4.testing == 1].shape[0] > 0:
-        t_start_test = df4[df4.testing == 1].iloc[0].time
-        t_end_test = df4[df4.testing == 1].iloc[-1].time
+    if df4[df4.testing == True].shape[0] > 0:
+        t_start_test = df4[df4.testing == True].iloc[0].time
+        t_end_test = df4[df4.testing == True].iloc[-1].time
         fig.add_shape(
             # filled Rectangle
             go.layout.Shape(
@@ -246,7 +246,7 @@ def create_plot():
             ),
             row=2, col=2
             )
-        fig.update_shapes(dict(xref='x', yref='y'))
+        fig.update_shapes(dict(xref='x4', yref='y4'))
 
 
     fig.update_layout(height=800, width=1000, title_text="Batteries", showlegend=False)
@@ -258,7 +258,7 @@ def create_plot():
             x=df1.tail(1).time.values[0], y=df1.tail(1).voltage.values[0], # annotation point
             xref='x1', 
             yref='y1',
-            text=str(df1.tail(1).spent_mah.values[0]) + 'mAh',
+            text=str(round(df1.spent_mah.max(), 3)) + 'mAh',
             showarrow=True,
             arrowhead=7,
             ax=10,
@@ -271,7 +271,7 @@ def create_plot():
             x=df2.tail(1).time.values[0], y=df2.tail(1).voltage.values[0], # annotation point
             xref='x2', 
             yref='y2',
-            text=str(df2.tail(1).spent_mah.values[0]) + 'mAh',
+            text=str(round(df2.spent_mah.max(), 3)) + 'mAh',
             showarrow=True,
             arrowhead=7,
             ax=10,
@@ -284,7 +284,7 @@ def create_plot():
             x=df3.tail(1).time.values[0], y=df3.tail(1).voltage.values[0], # annotation point
             xref='x3', 
             yref='y3',
-            text=str(df3.tail(1).spent_mah.values[0]) + 'mAh',
+            text=str(round(df3.spent_mah.max(), 3)) + 'mAh',
             showarrow=True,
             arrowhead=7,
             ax=10,
@@ -297,7 +297,7 @@ def create_plot():
             x=df4.tail(1).time.values[0], y=df4.tail(1).voltage.values[0], # annotation point
             xref='x4', 
             yref='y4',
-            text=str(df4.tail(1).spent_mah.values[0]) + 'mAh',
+            text=str(round(df4.spent_mah.max(), 3)) + 'mAh',
             showarrow=True,
             arrowhead=7,
             ax=10,

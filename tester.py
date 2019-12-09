@@ -148,12 +148,15 @@ def relays_initialization(slot_infos, mcp, csv_file):
         # we record it
         if os.path.isfile(csv_file):
             df = pd.read_csv(csv_file)
-            testing_session = int(df[df.slot_id == slot_id].testing_session.values[-1])
+            if df[df.slot_id == slot_id].shape[0] > 0:
+                testing_session = int(df[df.slot_id == slot_id].testing_session.values[-1])
+            else:
+                testing_session = 0
         else:
             testing_session = 0
         slot_measure = pd.Series(
-            data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 0, testing_session, mah],
-            index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session', 'spent_mah']
+            data=[datetime.now(), slot_id, voltage, False, testing_session, mah],
+            index=['time', 'slot_id', 'voltage', 'testing', 'testing_session', 'spent_mah']
         )
         df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
 
@@ -165,8 +168,8 @@ def relays_initialization(slot_infos, mcp, csv_file):
             voltage = read_voltage(slot_id, slot_infos, mcp)
             
             slot_measure = pd.Series(
-                data=[datetime.now(), slot_id, voltage, slot_infos[slot_id]['relay_open'], 1, testing_session, mah],
-                index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session', 'spent_mah']
+                data=[datetime.now(), slot_id, voltage, True, testing_session, mah],
+                index=['time', 'slot_id', 'voltage', 'testing', 'testing_session', 'spent_mah']
             )
 
             df = pd.DataFrame(slot_measure)
@@ -229,7 +232,7 @@ while True:
 
             last_measure = df_slots_history[df_slots_history.slot_id == slot_id].tail(1)
             last_testing_session = last_measure.testing_session.values[0]
-            last_testing = last_measure.testing.values[0]
+            last_testing = bool(last_measure.testing.values[0])
             last_voltage = float(last_measure.voltage.values[0])
             last_mah = float(last_measure.spent_mah.values[0])
             mah = 0
@@ -251,7 +254,8 @@ while True:
             if (
                 (last_voltage > discharged_voltage)
                 and (voltage <= discharged_voltage)
-                and last_testing == 1
+                and (voltage > voltage_empty_slot)
+                and last_testing == True
             ):
                 print("case 1, end of battery testing")
                 
@@ -259,7 +263,7 @@ while True:
                 df_testing_session = df_slots_history[
                     (df_slots_history.slot_id == slot_id)
                     & (df_slots_history.testing_session == last_testing_session)
-                    & (df_slots_history.testing == 1)
+                    & (df_slots_history.testing == True)
                 ]
                 battery_capacity = df_testing_session.voltage.sum() / R / 3600 / 1000
                 print('battery ' + str(slot_id) + ' tested at ' + str(battery_capacity) + ' mAh')
@@ -280,7 +284,7 @@ while True:
                     )
                 
                 open_relay(slot_id, slot_infos)
-                last_testing = 0
+                last_testing = False
 
             # ============= Case 3 ============= 
             # if
@@ -299,7 +303,7 @@ while True:
                 # if the battery was under testing, we interrupt the test, and open the relay
                 if last_testing:
                     print("test interrupted")
-                    last_testing = 0
+                    last_testing = False
                     open_relay(slot_id, slot_infos)
                     
             # ============= Case 4 ============= 
@@ -321,7 +325,7 @@ while True:
                 
                 if voltage > min_charged_voltage:
                     print("The battery is charged, starting test")
-                    last_testing = 1
+                    last_testing = True
                     close_relay(slot_id, slot_infos)
                     
                 elif voltage > discharged_voltage:
@@ -345,27 +349,27 @@ while True:
                 # print("case 6, still empty battery")
                 pass
 
-            if last_testing == 1:
-                mah = str(round(last_mah + voltage / R / 3600 / 1000 * delta_t, 3))
+            if last_testing == True:
+                mah = round(last_mah + voltage / R / 3600 * 1000 * delta_t, 3)
             timenow = datetime.now()
-            voltage = str(round(voltage, 3))
+            voltage = round(voltage, 3)
             
             slot_measure = pd.Series(
-                    data=[timenow, slot_id, voltage, slot_infos[slot_id]['relay_open'], last_testing, last_testing_session, mah],
-                    index=['time', 'slot_id', 'voltage', 'relay_open', 'testing', 'testing_session', 'spent_mah']
+                    data=[timenow, slot_id, voltage, last_testing, last_testing_session, mah],
+                    index=['time', 'slot_id', 'voltage', 'testing', 'testing_session', 'spent_mah']
                 )
             df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
             
             df = pd.DataFrame(slot_measure)
             df[0] = df[0].astype(str)
 
-            if not ( (float(voltage) < voltage_empty_slot) and (last_voltage < voltage_empty_slot) ):
+            if not ( (voltage < voltage_empty_slot) and (last_voltage < voltage_empty_slot) ):
                 if os.path.isfile(csv_file):
                     df.T.to_csv(csv_file, mode='a', header=False, index=False)
                 else:
                     df.T.to_csv(csv_file, index=False)
 
-            if last_testing == 1:
+            if last_testing == True:
                 print('batt ' + str(slot_id) + ": " + str(last_voltage) + "/" + str(voltage))
             
         time.sleep(delta_t)
