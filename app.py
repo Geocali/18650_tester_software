@@ -32,6 +32,8 @@ def create_plot():
 
     fig = make_subplots(rows=2, cols=2, subplot_titles=("Slot 1", "Slot 2", "Slot 3", "Slot 4"))
     
+    shapes = []
+
     # ========== slot 1 ============
     fig.add_trace(
         go.Scatter(
@@ -65,8 +67,7 @@ def create_plot():
     if df1[df1.testing == True].shape[0] > 0:
         t_start_test = df1[df1.testing == True].iloc[0].time
         t_end_test = df1[df1.testing == True].iloc[-1].time
-        fig.add_shape(
-            # filled Rectangle
+        shapes.append(
             go.layout.Shape(
                 type="rect",
                 x0=t_start_test,
@@ -81,10 +82,10 @@ def create_plot():
                             opacity=0.5,
                 layer="below",
                 line_width=0,
-            ),
-            row=1, col=1
+                xref="x1",
+                yref="y1"
             )
-        fig.update_shapes(dict(xref='x1', yref='y1'))
+        )
 
     # =========== slot 2 ==============
     fig.add_trace(
@@ -119,8 +120,8 @@ def create_plot():
     if df2[df2.testing == True].shape[0] > 0:
         t_start_test = df2[df2.testing == True].iloc[0].time
         t_end_test = df2[df2.testing == True].iloc[-1].time
-        fig.add_shape(
-            # filled Rectangle
+        
+        shapes.append(
             go.layout.Shape(
                 type="rect",
                 x0=t_start_test,
@@ -135,10 +136,10 @@ def create_plot():
                             opacity=0.5,
                 layer="below",
                 line_width=0,
-            ),
-            row=1, col=2
+                xref="x2",
+                yref="y2"
             )
-        fig.update_shapes(dict(xref='x2', yref='y2'))
+        )
 
     # ========= slot 3 =========
     fig.add_trace(
@@ -173,8 +174,8 @@ def create_plot():
     if df3[df3.testing == True].shape[0] > 0:
         t_start_test = df3[df3.testing == True].iloc[0].time
         t_end_test = df3[df3.testing == True].iloc[-1].time
-        fig.add_shape(
-            # filled Rectangle
+
+        shapes.append(
             go.layout.Shape(
                 type="rect",
                 x0=t_start_test,
@@ -189,10 +190,10 @@ def create_plot():
                             opacity=0.5,
                 layer="below",
                 line_width=0,
-            ),
-            row=2, col=1
+                xref="x3",
+                yref="y3"
             )
-        fig.update_shapes(dict(xref='x3', yref='y3'))
+        )
 
     # ========== slot 4 ===========
     fig.add_trace(
@@ -227,8 +228,8 @@ def create_plot():
     if df4[df4.testing == True].shape[0] > 0:
         t_start_test = df4[df4.testing == True].iloc[0].time
         t_end_test = df4[df4.testing == True].iloc[-1].time
-        fig.add_shape(
-            # filled Rectangle
+
+        shapes.append(
             go.layout.Shape(
                 type="rect",
                 x0=t_start_test,
@@ -243,64 +244,69 @@ def create_plot():
                             opacity=0.5,
                 layer="below",
                 line_width=0,
-            ),
-            row=2, col=2
+                xref="x4",
+                yref="y4"
             )
-        fig.update_shapes(dict(xref='x4', yref='y4'))
+        )
 
-
+    fig['layout'].update(shapes=shapes)
     fig.update_layout(height=800, width=1000, title_text="Batteries", showlegend=False)
 
     if df1.shape[0] == 0:
         dict1 = {}
     else:
+        x=df1[df1.testing == True].time.max()
         dict1 = dict(
-            x=df1.tail(1).time.values[0], y=df1.tail(1).voltage.values[0], # annotation point
+            x=x, y=df1[df1.time == x].voltage.values[0], # annotation point
             xref='x1', 
             yref='y1',
             text=str(round(df1.spent_mah.max(), 3)) + 'mAh',
             showarrow=True,
             arrowhead=7,
-            ax=10,
+            ax=-10,
             ay=70
         )
     if df2.shape[0] == 0:
         dict2 = {}
     else:
+        x=df2[df2.testing == True].time.max()
         dict2 = dict(
-            x=df2.tail(1).time.values[0], y=df2.tail(1).voltage.values[0], # annotation point
+            x=x, y=df2[df2.time == x].voltage.values[0], # annotation point
             xref='x2', 
             yref='y2',
             text=str(round(df2.spent_mah.max(), 3)) + 'mAh',
             showarrow=True,
             arrowhead=7,
-            ax=10,
+            ax=-10,
             ay=70
         )
     if df3.shape[0] == 0:
         dict3 = {}
     else:
+        x=df3[df3.testing == True].time.max()
         dict3 = dict(
-            x=df3.tail(1).time.values[0], y=df3.tail(1).voltage.values[0], # annotation point
+            x=x, y=df3[df3.time == x].voltage.values[0],
+            #x=df3.tail(1).time.values[0], y=df3.tail(1).voltage.values[0], # annotation point
             xref='x3', 
             yref='y3',
             text=str(round(df3.spent_mah.max(), 3)) + 'mAh',
             showarrow=True,
             arrowhead=7,
-            ax=10,
+            ax=-10,
             ay=70
         )
     if df4.shape[0] == 0:
         dict4 = {}
     else:
+        x=df4[df4.testing == True].time.max()
         dict4 = dict(
-            x=df4.tail(1).time.values[0], y=df4.tail(1).voltage.values[0], # annotation point
+            x=x, y=df4[df4.time == x].voltage.values[0],
             xref='x4', 
             yref='y4',
             text=str(round(df4.spent_mah.max(), 3)) + 'mAh',
             showarrow=True,
             arrowhead=7,
-            ax=10,
+            ax=-10,
             ay=70
         )
 
