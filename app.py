@@ -252,7 +252,7 @@ def create_plot():
     fig['layout'].update(shapes=shapes)
     fig.update_layout(height=800, width=1000, title_text="Batteries", showlegend=False)
 
-    if df1.shape[0] == 0:
+    if df1[df1.testing == True].shape[0] == 0:
         dict1 = {}
     else:
         x=df1[df1.testing == True].time.max()
@@ -266,7 +266,7 @@ def create_plot():
             ax=-10,
             ay=70
         )
-    if df2.shape[0] == 0:
+    if df2[df2.testing == True].shape[0] == 0:
         dict2 = {}
     else:
         x=df2[df2.testing == True].time.max()
@@ -280,7 +280,7 @@ def create_plot():
             ax=-10,
             ay=70
         )
-    if df3.shape[0] == 0:
+    if df3[df3.testing == True].shape[0] == 0:
         dict3 = {}
     else:
         x=df3[df3.testing == True].time.max()
@@ -295,7 +295,7 @@ def create_plot():
             ax=-10,
             ay=70
         )
-    if df4.shape[0] == 0:
+    if df4[df4.testing == True].shape[0] == 0:
         dict4 = {}
     else:
         x=df4[df4.testing == True].time.max()
