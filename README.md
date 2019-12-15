@@ -1,35 +1,94 @@
-# Raspberry -based, 4-slots 18650 battery tester
+# Installation
 
-An open source 18650 battery tester that discharges 4 batteries into 4 resistors, record the current flowing each second, and deducing the total capacity of the battery.
+## Configure I2C
+```
+sudo pip3 install --upgrade setuptools
+sudo apt-get install -y python-smbus
+sudo apt-get install -y i2c-tools
+```
+```
+sudo raspi-config
+```
+Interfacing options / I2C / YES
 
-Just put the charged battery in a slot, and the test starts automatically.
+```
+sudo reboot
+sudo i2cdetect -y 1
+```
 
-You can follow the status of all the batteries in your browser, thanks to an Angular app:
+## Configure SPI
+```
+sudo raspi-config
+Interfacing options / SPI / YES
+sudo reboot
+ls -l /dev/spidev*
+```
 
-![batteries dashboard](batteries_testing.png)
+## Install libraries
+```
+pip3 install -f requirements.txt
+sudo apt-get install libmariadbclient-dev
+```
 
-## List of material
+## Test I2C and SPI libraries
+```
+import board
+import digitalio
+import busio
+ 
+print("Hello blinka!")
+```
+ 
+# Try to great a Digital input
+```
+pin = digitalio.DigitalInOut(board.D4)
+print("Digital IO ok!")
+```
+ 
+# Try to create an I2C device
+```
+i2c = busio.I2C(board.SCL, board.SDA)
+print("I2C ok!")
+```
+ 
+# Try to create an SPI device
+```
+spi = busio.SPI(board.SCLK, board.MOSI, board.MISO)
+print("SPI ok!")
+ 
+print("done!")'''
+```
 
-- 1x raspberry pi
-- 1x 4-channel 5V relay
-- 4x 4Ohm 5W resistors
-- 1x MCP3008 Analog numeric converter
-- 1x 4 slots battery holder
+Run `mcp3008_differential_simpletest.py` to see if the MCP3008 library works
 
-## Wiring schematics
+# Control Relay
+https://tutorials-raspberrypi.com/raspberry-pi-control-relay-switch-via-gpio/
+https://pinout.xyz/
 
-![schematics](schematic.svg)
+# MCP3008
+https://pimylifeup.com/raspberry-pi-adc/
 
-## Structure of the program
+# Run the app
 
-The program is composed of 
-- a python script that periodically records the voltages, deduce the current and save them in a Mariadb database
-- a Flask api that retrieves data from the database
-- an Angular front end that shows the batteries dashboard
+## Setup the database
+```
+sudo apt-get install mariadb-server
+sudo mysql -u root
+use mysql;
+update user set plugin='' where User='root';
+flush privileges;
+\q
+mysql_secure_installation
+mysql -u root -p (caramel)
+CREATE DATABASE battery_schema;
+\q
 
-## Run it
+## Start the script that manages the testing of the batteries
+python3 tester.py
 
-- Prepare the raspberry and run the backend : follow the instructions in `flaskapp/README.md`
-- Install and run the front end : follow the instructions in `angularapp/README.md`
+## Start the Flask API
+python3 app.py
+```
 
-You can also run the back end in a non-raspberry computer, as an emulation has been created in `flaskapp/tester.py`, in order to ease the developments.
+# Debug
+python3 -m ptvsd --host 0.0.0.0 --port 5679 app.py
