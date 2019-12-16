@@ -210,6 +210,7 @@ R = 4 # Ohm
 voltage_empty_slot = 1
 # time between measures
 delta_t = 10  # seconds
+nextcloud_domain = "savial.yourownnet.cloud"
 
 csv_file = 'output/measures.csv'
 df_slots_history = relays_initialization(slot_infos, mcp, csv_file)
@@ -277,7 +278,7 @@ while True:
                 if export_nextcloud:
                     data = open("output/" + filename, 'rb').read()
                     response = requests.put(
-                        "https://savial.yourownnet.cloud/remote.php/webdav/automatic_uploads/" + filename,
+                        "https://" + nextcloud_domain + "/remote.php/webdav/automatic_uploads/" + filename,
                         data=data,
                         verify=False,
                         auth=(creds.login, creds.password)

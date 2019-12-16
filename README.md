@@ -1,15 +1,44 @@
-# Installation
+# Raspberry -based, 4-slots 18650 battery tester
+
+This is an open source 18650 battery tester that discharges 4 batteries into 4 resistors, records the current flowing each second, and deduces the total capacity of the battery.
+
+Just put the charged battery in a slot, and the test starts automatically if the battery is charged. You can then follow the test on curves updated automatically in a web page.
+
+# Construction
+
+## List of material
+
+- 1x raspberry pi
+- 1x 4-channel 5V relay
+- 4x 4Ohm 5W resistors
+- 1x MCP3008 Analog numeric converter
+- 1x 4 slots battery holder
+- 1x USB wifi dongle (optional)
+
+## Wiring
+
+![tester schematics](docs/schematic.svg)
+
+# Set up your Raspberry
 
 ## Configure I2C
+
+### Install the required libraries
+
 ```
 sudo pip3 install --upgrade setuptools
 sudo apt-get install -y python-smbus
 sudo apt-get install -y i2c-tools
 ```
+
+### Enable I2C
+
 ```
 sudo raspi-config
 ```
-Interfacing options / I2C / YES
+In the menus, go to `Interfacing options`, then `I2C` and choose `YES`
+
+Then, run
 
 ```
 sudo reboot
@@ -17,6 +46,9 @@ sudo i2cdetect -y 1
 ```
 
 ## Configure SPI
+
+Configure SPI with the following commands:
+
 ```
 sudo raspi-config
 Interfacing options / SPI / YES
@@ -24,71 +56,21 @@ sudo reboot
 ls -l /dev/spidev*
 ```
 
-## Install libraries
+## Install additional libraries
 ```
 pip3 install -f requirements.txt
-sudo apt-get install libmariadbclient-dev
 ```
-
-## Test I2C and SPI libraries
-```
-import board
-import digitalio
-import busio
- 
-print("Hello blinka!")
-```
- 
-# Try to great a Digital input
-```
-pin = digitalio.DigitalInOut(board.D4)
-print("Digital IO ok!")
-```
- 
-# Try to create an I2C device
-```
-i2c = busio.I2C(board.SCL, board.SDA)
-print("I2C ok!")
-```
- 
-# Try to create an SPI device
-```
-spi = busio.SPI(board.SCLK, board.MOSI, board.MISO)
-print("SPI ok!")
- 
-print("done!")'''
-```
-
-Run `mcp3008_differential_simpletest.py` to see if the MCP3008 library works
-
-# Control Relay
-https://tutorials-raspberrypi.com/raspberry-pi-control-relay-switch-via-gpio/
-https://pinout.xyz/
-
-# MCP3008
-https://pimylifeup.com/raspberry-pi-adc/
 
 # Run the app
 
-## Setup the database
-```
-sudo apt-get install mariadb-server
-sudo mysql -u root
-use mysql;
-update user set plugin='' where User='root';
-flush privileges;
-\q
-mysql_secure_installation
-mysql -u root -p (caramel)
-CREATE DATABASE battery_schema;
-\q
-
 ## Start the script that manages the testing of the batteries
+```
 python3 tester.py
+```
 
 ## Start the Flask API
+```
 python3 app.py
 ```
 
-# Debug
-python3 -m ptvsd --host 0.0.0.0 --port 5679 app.py
+# Develop
