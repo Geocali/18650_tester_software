@@ -1,8 +1,18 @@
 # Raspberry -based, 4-slots 18650 battery tester
 
-This is an open source 18650 battery tester that discharges 4 batteries into 4 resistors, records the current flowing each second, and deduces the total capacity of the battery.
+This is an open source lithium-ion 18650 cells tester that discharges 4 batteries into 4 resistors, records the current flowing each second, and deduces the total capacity of the cell.
 
-Just put the charged battery in a slot, and the test starts automatically if the battery is charged. You can then follow the test on curves updated automatically in a web page.
+Just put the charged cell in a slot, and the test starts automatically if the cell is charged. You can then follow the test on curves updated automatically in a web page.
+
+At the end of the test, a csv file is created with the recorded voltages and capacity.
+
+When one cell is tested, you can replace it independently of the others.
+
+The advantages of this projects versus a commercial tester like the iMax B6 are:
+- all slots are totally independent
+- you can see the precise behaviour of the cell
+- you can easily create statistics on the tested cells from the saved csv files
+- you can expend it to manage more cells
 
 # Construction
 
@@ -18,6 +28,14 @@ Just put the charged battery in a slot, and the test starts automatically if the
 ## Wiring
 
 ![tester schematics](docs/schematic.svg)
+
+Example of construction
+
+![construction example](docs/constructed_tester.jpg)
+
+Test curves
+
+![test curves](docs/test_curves.jpg)
 
 # Set up your Raspberry
 
@@ -61,7 +79,7 @@ ls -l /dev/spidev*
 pip3 install -f requirements.txt
 ```
 
-# Run the app
+# Run the program
 
 ## Start the script that manages the testing of the batteries
 ```
@@ -73,4 +91,13 @@ python3 tester.py
 python3 app.py
 ```
 
-# Develop
+# Use it
+
+- First, charge your cells, for example with TP4056 cards.
+- Start the raspberry and run the program
+- Put the cells in the slots
+- Check the curves at http://(raspberryip):8080 or http://localhost:8080 if you work directly on your raspberry
+- When a cell is tested, the curve is going out of the blue area
+- Replace it with a new cell (wait for 10s before putting the new one)
+
+![curve detail](docs/curve_detail.jpg)
