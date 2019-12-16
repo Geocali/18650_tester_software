@@ -27,7 +27,7 @@ The advantages of this projects versus a commercial tester like the iMax B6 are:
 
 ## Wiring
 
-![tester schematics](docs/schematic.svg)
+![tester schematics](docs/schematic.png)
 
 Example of construction
 
