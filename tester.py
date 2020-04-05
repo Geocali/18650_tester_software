@@ -9,13 +9,17 @@ import os.path
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM) # GPIO Numbers instead of board numbers
-import busio
-import digitalio
-import board
-import adafruit_mcp3xxx.mcp3008 as MCP
-from adafruit_mcp3xxx.analog_in import AnalogIn
+try:
+    import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM) # GPIO Numbers instead of board numbers
+    import busio
+    import digitalio
+    import board
+    import adafruit_mcp3xxx.mcp3008 as MCP
+    from adafruit_mcp3xxx.analog_in import AnalogIn
+except:
+    # we are not on a raspberry, but we still can do some tests
+    from rpi_mock import *
 
 def close_relay(slot_id, slot_infos):
     # ==== close the relay ====
@@ -131,7 +135,6 @@ R = 4 # Ohm
 voltage_empty_slot = 1
 # time between measures
 delta_t = 10  # seconds
-nextcloud_domain = "savial.yourownnet.cloud"
 
 csv_file = 'output/measures.csv'
 df_slots_history = relays_initialization(slot_infos, mcp, csv_file)
@@ -193,17 +196,6 @@ while True:
                 # export to file
                 filename = str(datetime.now())[0:19].replace(":", "") + "_" + str(slot_id) + "_" + str(int(last_testing_session)) + "_" + str(int(battery_capacity)) + "mAh.csv"
                 df_testing_session.to_csv("output/" + filename, sep=",", index=False)
-
-                # export file to nextcloud
-                export_nextcloud = False
-                if export_nextcloud:
-                    data = open("output/" + filename, 'rb').read()
-                    response = requests.put(
-                        "https://" + nextcloud_domain + "/remote.php/webdav/automatic_uploads/" + filename,
-                        data=data,
-                        verify=False,
-                        auth=(creds.login, creds.password)
-                    )
                 
                 open_relay(slot_id, slot_infos)
                 last_testing = False
