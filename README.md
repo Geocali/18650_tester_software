@@ -101,3 +101,18 @@ python3 app.py
 - Replace it with a new cell (wait for 10s before putting the new one)
 
 ![curve detail](docs/curve_detail.jpg)
+
+
+# Contributing
+
+Create a virtual environment:
+```
+pipenv install
+```
+
+Then
+```
+pipenv shell
+```
+
+Then, to run the tests, install pytest, and run the command ```pytest```

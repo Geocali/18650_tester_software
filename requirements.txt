@@ -8,3 +8,7 @@ flask_cors
 pandas
 ptvsd
 plotly
+pytest
+numpy
+# tkinter
+matplotlib
