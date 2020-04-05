@@ -30,8 +30,6 @@ R = 4 # Ohm
 voltage_empty_slot = 1
 # time between measures
 delta_t = 10  # seconds
-# file where to write the result of the measures
-csv_file = 'output/measures.csv'
 
 
 def close_relay(slot_id, slot_infos):
@@ -63,7 +61,8 @@ def read_voltage(slot_id, slot_infos, mcp):
     pin0 = slot_infos[slot_id]["mcp_pin0"]
     pin1 = slot_infos[slot_id]["mcp_pin1"]
     time.sleep(0.1)
-    return AnalogIn(mcp, pin0, pin1).voltage / 3.3 * 5
+    voltage = AnalogIn(mcp, pin0, pin1).voltage / 3.3 * 5
+    return voltage
 
 
 def read_all_voltages_t(slot_infos, mcp):
@@ -120,7 +119,8 @@ def relays_initialization(slot_infos, mcp, csv_file):
             df_slots_history = df_slots_history.append(slot_measure, ignore_index=True)
     return df_slots_history
 
-def main_function():
+
+def main_function(csv_file='output/measures.csv'):
     slot_infos = {
         1: {"relay_gpio":5, "mcp_pin0": MCP.P0, "mcp_pin1": MCP.P1, "relay_open": True, "testing": False},
         2: {"relay_gpio":6, "mcp_pin0": MCP.P2, "mcp_pin1": MCP.P3, "relay_open": True, "testing": False},
@@ -134,7 +134,6 @@ def main_function():
     cs = digitalio.DigitalInOut(board.CE0)
     # create the mcp object (harware option)
     mcp = MCP.MCP3008(spi, cs)
-
 
     # ==== beginning of the capacity measure ====
 
@@ -155,13 +154,6 @@ def main_function():
         last_voltage = float(last_measure.voltage.values[0])
         last_mah = float(last_measure.spent_mah.values[0])
         mah = 0
-        
-        # ============= Case 1 ==================
-        # - the preceding voltage was > discharged_voltage
-        # - and current voltage < discharged_voltage
-        # - and the battery is under testing
-        # we send the conclusions and open the relay
-        # print("-----", last_voltage, voltage, last_testing)
 
         # ============= Case 1 ==================
         # - the preceding voltage was > discharged_voltage

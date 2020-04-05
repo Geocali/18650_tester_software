@@ -1,4 +1,5 @@
-i = 0
+import json
+
 
 class MCP:
     P0 = 0
@@ -38,9 +39,24 @@ class GPIO:
     def output(selfa, b):
         return None
 
+
+def get_i(slot_id):
+    with open('test_state.json') as json_file: 
+        test_state = json.load(json_file)
+    i = test_state[str(int(slot_id))]
+    test_state[str(int(slot_id))] += 1
+    jsons = json.dumps(test_state)
+    with open("test_state.json","w") as f:
+        f.write(jsons)
+    return i
+
+
 def AnalogIn(mcp, pin0, pin1):
 
     slot_id = pin0 / 2 + 1
+
+    i = get_i(slot_id)
+
     voltage_start = 0
     delta = 0.01
     if i == 0:
