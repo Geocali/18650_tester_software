@@ -60,7 +60,29 @@ class TesterOutline(tk.Tk):
         self.fig = Figure()
         graph = FigureCanvasTkAgg(self.fig,self.graph_tab)
         graph.get_tk_widget().pack(side='top',fill='both',expand=True)
-        MainGraph(self.fig)
+        
+        self.l, self.axes = plt.subplots(2, 2)
+        self.create_plot()
+        self.update_plot(graph)
+
+    def create_plot(self):
+        self.axes = []
+        for slot_id in range(1, 5):
+            self.axes.append(self.fig.add_subplot(2, 2, slot_id))
+            df_measures = tester.main_function()
+            df_values = df_measures[df_measures.slot_id == slot_id]
+            x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[m]').values[1:]
+            y = df_values.voltage.values[1:]
+            curve, = self.axes[slot_id - 1].plot(x, y)
+
+    def update_plot(self, graph):
+        self.axes[0].clear()
+        curve, = self.axes[0].plot([2, 3, 5, 2], np.random.rand(1, 4)[0])
+        graph.draw()
+        graph.flush_events() # flush the GUI events
+        # call this function again in one second
+        self.after(1000, self.update_plot(graph))
+        
 
     def quit(self):
         '''
@@ -81,37 +103,32 @@ class MainGraph():
         self.fig = fig
 
         self.l, self.axes = plt.subplots(2, 2)
+        self.create_plot()
+        self.update_plot()
 
-        df_measures = tester.main_function()
+        # self.axes[slot_id - 1].plot([0, 1, 2, 3], [0, 1, 2, 3])
+        # a = 1
 
-        df_values = df_measures[df_measures.slot_id == 1]
-        x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[m]').values[1:]
-        y = df_values.voltage.values[1:]
-        self.axes[0][0].plot(x, y)
+    def create_plot(self):
+        self.axes = []
+        for slot_id in range(1, 5):
+            self.axes.append(self.fig.add_subplot(2, 2, slot_id))
+            df_measures = tester.main_function()
+            df_values = df_measures[df_measures.slot_id == slot_id]
+            x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[m]').values[1:]
+            y = df_values.voltage.values[1:]
+            curve, = self.axes[slot_id - 1].plot(x, y)
 
-        df_values = df_measures[df_measures.slot_id == 2]
-        x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[m]').values[1:]
-        y = df_values.voltage.values[1:]
-        self.axes[1][0].plot(x, y)
+    def update_plot(self):
 
+        self.axes[0].clear()
+
+        self.axes[0].plot([2, 3, 5, 2], np.random.rand(1, 4)[0])
+
+        # call this function again in one second
         time.sleep(1)
-
-        df_measures = tester.main_function()
-
-        df_values = df_measures[df_measures.slot_id == 1]
-        x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[m]').values[1:]
-        y = df_values.voltage.values[1:]
-        self.axes[0][0].plot(x, y)
-
-        df_values = df_measures[df_measures.slot_id == 2]
-        x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[m]').values[1:]
-        y = df_values.voltage.values[1:]
-        self.axes[1][0].plot(x, y)
-
-
-
-        plt.show()
-
+        self.update_plot
+        
 
         # df_measures = tester.main_function()
         # for slot_id in range(1, 5):
@@ -143,7 +160,8 @@ class MainGraph():
         # self.l, = self.create_plot(df_values, slot_id)
 
 
-    def create_plot(self, df_measures):
+
+    def create_plot0(self, df_measures):
 
         fig, (ax1, ax2, ax3, ax4) = plt.subplots(2, 2)
 
