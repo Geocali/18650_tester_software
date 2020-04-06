@@ -40,11 +40,17 @@ class GPIO:
         return None
 
 
+with open("test_state.json","w") as f:
+    jsons = json.dumps({1: 0, 2: 0, 3: 0, 4: 0})
+    f.write(jsons)
+
+
 def get_i(slot_id):
+    slot_id = str(int(float(slot_id)))
     with open('test_state.json') as json_file: 
         test_state = json.load(json_file)
-    i = test_state[str(int(slot_id))]
-    test_state[str(int(slot_id))] += 1
+    i = test_state[slot_id]
+    test_state[slot_id] += 1
     jsons = json.dumps(test_state)
     with open("test_state.json","w") as f:
         f.write(jsons)
@@ -52,36 +58,22 @@ def get_i(slot_id):
 
 
 def AnalogIn(mcp, pin0, pin1):
+    
+    vmax = 4.2
 
     slot_id = pin0 / 2 + 1
-
     i = get_i(slot_id)
 
-    voltage_start = 0
-    delta = 0.01
+    delta = 0.1
     if i == 0:
-        # the program is starting
-        if slot_id == 1:
-            voltage_start = 0
-        elif slot_id == 2:
-            voltage_start = 0
-        elif slot_id == 3:
-            voltage_start = 0
-        elif slot_id == 4:
-            voltage_start = 0
+        voltage_measured = 0
     else:
-        if slot_id == 1:
-            voltage_start = 4.1 - delta * i
-        elif slot_id == 2:
-            voltage_start = 4.15 - delta * i
-        elif slot_id == 3:
-            voltage_start = 4.2 - delta * i
-        elif slot_id == 4:
-            voltage_start = 4.25 - delta * i
+        voltage_measured = vmax - delta * i
+
 
     # infos for this slot and last testing session
     class AnalogInclass:
 
-        voltage = voltage_start * 3.3 / 5
+        voltage = voltage_measured * 3.3 / 5
 
     return AnalogInclass

@@ -2,7 +2,7 @@ import tester
 import pytest
 import json
 
-def test():
+def atest():
     test_state = {1: 0, 2: 0, 3: 0, 4: 0}
     jsons = json.dumps(test_state)
     f = open("test_state.json","w")
@@ -12,4 +12,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    atest()

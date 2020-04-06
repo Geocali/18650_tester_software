@@ -140,7 +140,6 @@ def main_function(csv_file='output/measures.csv'):
     df_slots_history = relays_initialization(slot_infos, mcp, csv_file)
         
     # print('===========')
-    i = 0
     for slot_id in list(slot_infos.keys()):
         
         # print('= slot id ', slot_id)
@@ -272,6 +271,5 @@ def main_function(csv_file='output/measures.csv'):
         if last_testing == True:
             print('batt ' + str(slot_id) + ": " + str(last_voltage) + "/" + str(voltage))
         
-    time.sleep(delta_t)
-    i += 1
+    return df_slots_history
 

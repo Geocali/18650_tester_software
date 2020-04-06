@@ -5,16 +5,18 @@ from tkinter import messagebox as msg
 
 import numpy as np
 import pandas as pd
+import time
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.widgets import Slider, Button, RadioButtons
+import matplotlib.pyplot as plt
 
-#----------------------------------------------------------
+import tester
+
 
 class TesterOutline(tk.Tk):
 
-    #------------------------------------------------------
     def __init__(self):
         # Inherit from tk.Tk
         super().__init__()
@@ -60,61 +62,93 @@ class TesterOutline(tk.Tk):
         graph.get_tk_widget().pack(side='top',fill='both',expand=True)
         MainGraph(self.fig)
 
-    #------------------------------------------------------
     def quit(self):
         '''
         Quit the program
         '''
         self.destroy()
 
-    #------------------------------------------------------
     def unfinished(self):
         '''
         Messagebox for unfinished items
         '''
         msg.showinfo('Unfinished','This feature has not been finished')
 
-    #------------------------------------------------------
-    def random_graph(self):
-        x = list(range(0,10))
-        y = [i**3 for i in x]
-
-        fig = Figure()
-        axes = fig.add_subplot(111)
-        axes.plot(x,y,label=r'$x^3$')
-        axes.legend()
-
-        return fig
-
-#----------------------------------------------------------
 
 class MainGraph():
 
-    #------------------------------------------------------
     def __init__(self,fig):
         self.fig = fig
 
-        i = 1
-        df_values = pd.read_csv("output/2019-12-09 151236_1_3_1302mAh.csv")
-        self.l, = self.create_plot(df_values, i)
+        self.l, self.axes = plt.subplots(2, 2)
 
-        i = 2
-        df_values = pd.read_csv("output/2019-12-09 152422_2_5_1510mAh.csv")
-        self.l, = self.create_plot(df_values, i)
+        df_measures = tester.main_function()
 
-        i = 3
-        df_values = pd.read_csv("output/2019-12-09 155111_4_4_1935mAh.csv")
-        self.l, = self.create_plot(df_values, i)
+        df_values = df_measures[df_measures.slot_id == 1]
+        x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[m]').values[1:]
+        y = df_values.voltage.values[1:]
+        self.axes[0][0].plot(x, y)
 
-        i = 4
-        df_values = pd.read_csv("output/2019-12-09 160424_3_4_2153mAh.csv")
-        self.l, = self.create_plot(df_values, i)
+        df_values = df_measures[df_measures.slot_id == 2]
+        x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[m]').values[1:]
+        y = df_values.voltage.values[1:]
+        self.axes[1][0].plot(x, y)
+
+        time.sleep(1)
+
+        df_measures = tester.main_function()
+
+        df_values = df_measures[df_measures.slot_id == 1]
+        x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[m]').values[1:]
+        y = df_values.voltage.values[1:]
+        self.axes[0][0].plot(x, y)
+
+        df_values = df_measures[df_measures.slot_id == 2]
+        x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[m]').values[1:]
+        y = df_values.voltage.values[1:]
+        self.axes[1][0].plot(x, y)
 
 
-    def create_plot(self, df_values, i):
+
+        plt.show()
+
+
+        # df_measures = tester.main_function()
+        # for slot_id in range(1, 5):
+        #     df_values = df_measures[df_measures.slot_id == slot_id]
+        #     self.l, = self.create_plot(df_values, slot_id)
+
+        # i = 0
+        # while i < 100:
+        #     df_measures = tester.main_function()
+        #     for slot_id in range(1, 5):
+                
+        #     time.sleep(1)
+        #     i += 1
+
+        # slot_id = 1
+        # df_values = pd.read_csv("output/2019-12-09 151236_1_3_1302mAh.csv")
+        # self.l, = self.create_plot(df_values, slot_id)
+
+        # slot_id = 2
+        # df_values = pd.read_csv("output/2019-12-09 152422_2_5_1510mAh.csv")
+        # self.l, = self.create_plot(df_values, slot_id)
+
+        # slot_id = 3
+        # df_values = pd.read_csv("output/2019-12-09 155111_4_4_1935mAh.csv")
+        # self.l, = self.create_plot(df_values, slot_id)
+
+        # slot_id = 4
+        # df_values = pd.read_csv("output/2019-12-09 160424_3_4_2153mAh.csv")
+        # self.l, = self.create_plot(df_values, slot_id)
+
+
+    def create_plot(self, df_measures):
+
+        fig, (ax1, ax2, ax3, ax4) = plt.subplots(2, 2)
 
         # Set up figure with centered axes and grid
-        self.ax = self.fig.add_subplot(2, 2, i)
+        self.ax = self.fig.add_subplot(2, 2, slot_id)
         
         self.ax.set_ylim(2.8,4.3)
         self.ax.grid(color='lightgray',linestyle='--')
