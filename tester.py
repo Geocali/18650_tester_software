@@ -19,6 +19,11 @@ except:
     from rpi_mock import *
 
 
+with open("test_state.json","w") as f:
+    jsons = json.dumps({1: 0, 2: 0, 3: 0, 4: 0})
+    f.write(jsons)
+
+
 # ==== global parameters ====
 # voltage under which we consider the battery as discharged
 discharged_voltage = 3
@@ -136,8 +141,11 @@ def main_function(csv_file='output/measures.csv'):
     mcp = MCP.MCP3008(spi, cs)
 
     # ==== beginning of the capacity measure ====
-
-    df_slots_history = relays_initialization(slot_infos, mcp, csv_file)
+    # we initialize the relays only at the beginning
+    if not os.path.exists(csv_file):
+        df_slots_history = relays_initialization(slot_infos, mcp, csv_file)
+    else:
+        df_slots_history = pd.read_csv(csv_file)
         
     # print('===========')
     for slot_id in list(slot_infos.keys()):

@@ -58,22 +58,19 @@ def get_i(slot_id):
 
 
 def AnalogIn(mcp, pin0, pin1):
-    
-    vmax = 4.2
-
     slot_id = pin0 / 2 + 1
+    # TODO: remove usage of test_state.json, and count the recordings in output/measures.csv
     i = get_i(slot_id)
 
+    vmax = 4.2
     delta = 0.1
     if i == 0:
         voltage_measured = 0
     else:
         voltage_measured = vmax - delta * i
 
-
     # infos for this slot and last testing session
     class AnalogInclass:
-
         voltage = voltage_measured * 3.3 / 5
 
     return AnalogInclass

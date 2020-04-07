@@ -5,6 +5,7 @@ import json
 
 
 def reset_state_file():
+    
     with open("test_state.json","w") as f:
         jsons = json.dumps({1: 0, 2: 0, 3: 0, 4: 0})
         f.write(jsons)
