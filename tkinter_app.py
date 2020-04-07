@@ -81,16 +81,28 @@ class TesterOutline(tk.Tk):
     def update_plot(self, graph):
 
         df_measures = tester.main_function()
+        # TODO: plot curve only if the battery of the slot is currently testing
         for slot_id in range(1, 5):
             df_values = df_measures[df_measures.slot_id == slot_id]
             self.axes[slot_id - 1].clear()
-            x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[s]').values[1:]
-            y = df_values.voltage.values[1:]
-            curve, = self.axes[slot_id - 1].plot(x, y)
+            if df_values.iloc[-1].testing == 1:
+                x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[s]').values[1:]
+                y = df_values.voltage.values[1:]
+                curve, = self.axes[slot_id - 1].plot(x, y)
+            else:
+                left = 0.2
+                bottom = 0.5
+                self.axes[slot_id - 1].text(
+                    left, 
+                    bottom, 
+                    'Waiting for battery',
+                    horizontalalignment='left',
+                    verticalalignment='top',
+                    transform=self.axes[slot_id - 1].transAxes
+                    )
 
         graph.draw()
         graph.flush_events() # flush the GUI events
-        # time.sleep(10)
         # call this function again in the future
         self.after(10000, self.update_plot(graph))
         

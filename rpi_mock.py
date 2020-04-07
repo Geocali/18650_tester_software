@@ -68,6 +68,8 @@ def AnalogIn(mcp, pin0, pin1):
         voltage_measured = 0
     else:
         voltage_measured = vmax - delta * i
+        if voltage_measured < 3:
+            voltage_measured = 3
 
     # infos for this slot and last testing session
     class AnalogInclass:
