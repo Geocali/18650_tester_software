@@ -81,7 +81,6 @@ class TesterOutline(tk.Tk):
     def update_plot(self, graph):
 
         df_measures = tester.main_function()
-        # TODO: plot curve only if the battery of the slot is currently testing
         for slot_id in range(1, 5):
             df_values = df_measures[df_measures.slot_id == slot_id]
             self.axes[slot_id - 1].clear()
