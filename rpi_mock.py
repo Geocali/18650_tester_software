@@ -64,21 +64,10 @@ def AnalogIn(mcp, pin0, pin1):
     i = get_i(slot_id)
 
     # ---- read mock function in file ----
-    # read_voltage = dill.load("read_voltage.pkl")
     with open("read_voltage.pkl", 'rb') as pickle_file:
         read_voltage = dill.load(pickle_file)
 
-
     voltage_measured = read_voltage(i)
-
-    # vmax = 4.2
-    # delta = 0.1
-    # if i == 0:
-    #     voltage_measured = 0
-    # else:
-    #     voltage_measured = vmax - delta * i
-    #     if voltage_measured < 3:
-    #         voltage_measured = 3
 
     # infos for this slot and last testing session
     class AnalogInclass:
