@@ -19,11 +19,6 @@ except:
     from rpi_mock import *
 
 
-with open("test_state.json","w") as f:
-    jsons = json.dumps({1: 0, 2: 0, 3: 0, 4: 0})
-    f.write(jsons)
-
-
 # ==== global parameters ====
 # voltage under which we consider the battery as discharged
 discharged_voltage = 3
@@ -144,13 +139,13 @@ def main_function(csv_file='output/measures.csv'):
     # we initialize the relays only at the beginning
     if not os.path.exists(csv_file):
         df_slots_history = relays_initialization(slot_infos, mcp, csv_file)
+        first_measure = True
     else:
         df_slots_history = pd.read_csv(csv_file)
+        first_measure = False
         
     # print('===========')
     for slot_id in list(slot_infos.keys()):
-        
-        # print('= slot id ', slot_id)
         
         # we read the voltage of the battery
         voltage = read_voltage(slot_id, slot_infos, mcp)
@@ -257,6 +252,7 @@ def main_function(csv_file='output/measures.csv'):
             pass
 
         if last_testing == True:
+            # TODO: calculate the time from the measures file !!!!!!!!!!!!!!!!!!
             mah = round(last_mah + voltage / R / 3600 * 1000 * delta_t, 3)
         timenow = datetime.now()
         voltage = round(voltage, 3)
@@ -278,6 +274,11 @@ def main_function(csv_file='output/measures.csv'):
 
         if last_testing == True:
             print('batt ' + str(slot_id) + ": " + str(last_voltage) + "/" + str(voltage))
-        
+    
+    if first_measure:
+        # we remove the data created by the initialization function
+        # we did not remove it before, because we need it to calculate if a test is starting
+        df_slots_history = df_slots_history.iloc[4:]
+
     return df_slots_history
 

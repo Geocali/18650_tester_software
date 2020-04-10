@@ -67,7 +67,7 @@ def AnalogIn(mcp, pin0, pin1):
     with open("read_voltage.pkl", 'rb') as pickle_file:
         read_voltage = dill.load(pickle_file)
 
-    voltage_measured = read_voltage(i)
+    voltage_measured = read_voltage(slot_id, i)
 
     # infos for this slot and last testing session
     class AnalogInclass:

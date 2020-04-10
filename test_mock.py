@@ -38,10 +38,9 @@ class TestClass():
 
     def test_voltage_reading_first_value(self):
 
-        def read_voltage(i):
+        def read_voltage(slot_id, i):
             vmax = 4.2
             delta = 0.1
-            print(i)
             if i == 0:
                 voltage_measured = 0
             else:
@@ -63,10 +62,9 @@ class TestClass():
 
     def test_voltage_readings(self):
 
-        def read_voltage(i):
+        def read_voltage(slot_id, i):
             vmax = 4.2
             delta = 0.1
-            print(i)
             if i == 0:
                 voltage_measured = 0
             else:
