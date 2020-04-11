@@ -122,7 +122,7 @@ class TestClass():
         reports0 = [f for f in os.listdir('output') if re.match(r'[0-9]{4}.*mAh\.csv', f)]
         
         for i in range(5):
-            df_slots_history = tester.main_function()
+            tester.main_function()
         reports1 = [f for f in os.listdir('output') if re.match(r'[0-9]{4}.*mAh\.csv', f)]
         created_reports = np.setdiff1d(reports1, reports0)
 
@@ -158,7 +158,7 @@ class TestClass():
         reports0 = [f for f in os.listdir('output') if re.match(r'[0-9]{4}.*mAh\.csv', f)]
         
         for i in range(10):
-            df_slots_history = tester.main_function()
+            tester.main_function()
 
         reports1 = [f for f in os.listdir('output') if re.match(r'[0-9]{4}.*mAh\.csv', f)]
         created_reports = np.setdiff1d(reports1, reports0)
@@ -197,7 +197,7 @@ class TestClass():
         reports0 = [f for f in os.listdir('output') if re.match(r'[0-9]{4}.*mAh\.csv', f)]
         
         for i in range(10):
-            df_slots_history = tester.main_function()
+            tester.main_function()
 
         reports1 = [f for f in os.listdir('output') if re.match(r'[0-9]{4}.*mAh\.csv', f)]
         created_reports = np.setdiff1d(reports1, reports0)
@@ -238,7 +238,7 @@ class TestClass():
         reports0 = [f for f in os.listdir('output') if re.match(r'[0-9]{4}.*mAh\.csv', f)]
         
         for i in range(10):
-            df_slots_history = tester.main_function()
+            tester.main_function()
 
         reports1 = [f for f in os.listdir('output') if re.match(r'[0-9]{4}.*mAh\.csv', f)]
         created_reports = np.setdiff1d(reports1, reports0)
