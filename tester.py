@@ -269,6 +269,8 @@ def main_function(csv_file='output/measures.csv'):
             if os.path.isfile(csv_file):
                 df.T.to_csv(csv_file, mode='a', header=False, index=False)
             else:
+                if not os.path.exists("output"):
+                    os.mkdir("output")
                 df.T.to_csv(csv_file, index=False)
 
         if last_testing == True:

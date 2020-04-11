@@ -8,6 +8,19 @@ import re
 
 
 class TestClass():
+    def setup_class(self):
+        if not os.path.exists("output"):
+            os.mkdir("output")
+            self.existant_csv = []
+        else:
+            self.existant_csv = [f for f in os.listdir('output') if re.match(r'[0-9]{4}.*mAh\.csv', f)]
+
+    def teardown_class(self):
+        new_csv = [f for f in os.listdir('output') if re.match(r'[0-9]{4}.*mAh\.csv', f)]
+        created_csv = np.setdiff1d(new_csv, self.existant_csv)
+        for csv in created_csv:
+            os.remove("output/" + csv)
+
     def setup_method(self):
         with open("test_state.json","w") as f:
             jsons = json.dumps({1: 0, 2: 0, 3: 0, 4: 0})
@@ -16,9 +29,6 @@ class TestClass():
         csv_file = 'output/measures.csv'
         if os.path.exists(csv_file):
             os.remove(csv_file)
-
-    def teardown_class(self):
-        print("teardown_class called once for the class")
 
 
     def test_when_a_charged_battery_is_present_the_test_is_started(self):
