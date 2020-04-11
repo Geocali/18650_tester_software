@@ -28,8 +28,6 @@ min_charged_voltage = 4
 R = 4 # Ohm
 # maximum voltage that we can read when there is no battery in the slot
 voltage_empty_slot = 1
-# time between measures
-delta_t = 10  # seconds
 
 
 def close_relay(slot_id, slot_infos):
@@ -250,11 +248,11 @@ def main_function(csv_file='output/measures.csv'):
         ):
             # print("case 6, still empty battery")
             pass
-
-        if last_testing == True:
-            # TODO: calculate the time from the measures file !!!!!!!!!!!!!!!!!!
-            mah = round(last_mah + voltage / R / 3600 * 1000 * delta_t, 3)
+        
         timenow = datetime.now()
+        if last_testing == True:
+            delta_t = (timenow - pd.to_datetime(df_slots_history[df_slots_history.slot_id == slot_id].iloc[-1].time)) / pd.Timedelta(1, "s")
+            mah = round(last_mah + voltage / R / 3600 * 1000 * delta_t, 3)
         voltage = round(voltage, 3)
         
         slot_measure = pd.Series(
@@ -266,7 +264,8 @@ def main_function(csv_file='output/measures.csv'):
         df = pd.DataFrame(slot_measure)
         df[0] = df[0].astype(str)
 
-        if not ( (voltage < voltage_empty_slot) and (last_voltage < voltage_empty_slot) ):
+        # if not ( (voltage < voltage_empty_slot) and (last_voltage < voltage_empty_slot) ):
+        if True:
             if os.path.isfile(csv_file):
                 df.T.to_csv(csv_file, mode='a', header=False, index=False)
             else:

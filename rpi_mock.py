@@ -60,7 +60,6 @@ def get_i(slot_id):
 
 def AnalogIn(mcp, pin0, pin1):
     slot_id = pin0 / 2 + 1
-    # TODO: remove usage of test_state.json, and count the recordings in output/measures.csv
     i = get_i(slot_id)
 
     # ---- read mock function in file ----
