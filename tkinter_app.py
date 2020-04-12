@@ -107,7 +107,7 @@ class TesterOutline(tk.Tk):
                         "A charged battery is \ninserted, starting test",
                         horizontalalignment='left',
                         verticalalignment='top',
-                        transform=self.axes[slot_id - 1].transAxes
+                        #transform=self.axes[slot_id - 1].transAxes
                         )
             elif (
                 df_session.testing.values[-1] == False
@@ -123,7 +123,7 @@ class TesterOutline(tk.Tk):
                     'Test interrupted \nWaiting for battery',
                     horizontalalignment='left',
                     verticalalignment='top',
-                    transform=self.axes[slot_id - 1].transAxes
+                    #transform=self.axes[slot_id - 1].transAxes
                     )
 
             elif df_values.voltage.values[-1] <= 0.5:
@@ -136,7 +136,7 @@ class TesterOutline(tk.Tk):
                     'Waiting for battery',
                     horizontalalignment='left',
                     verticalalignment='top',
-                    transform=self.axes[slot_id - 1].transAxes
+                    #transform=self.axes[slot_id - 1].transAxes
                     )
             elif np.all(df_session.testing.values == False):
                 # inserted battery not charged
@@ -148,7 +148,7 @@ class TesterOutline(tk.Tk):
                     'The inserted battery is \nnot fully charged \ntest not starting',
                     horizontalalignment='left',
                     verticalalignment='top',
-                    transform=self.axes[slot_id - 1].transAxes
+                    #transform=self.axes[slot_id - 1].transAxes
                     )
             elif (
                 df_session.testing.values[-1] == False
@@ -163,7 +163,7 @@ class TesterOutline(tk.Tk):
                     'The test is completed! \nCapacity: ' + str(round(df_session.spent_mah.max(), 3)),
                     horizontalalignment='left',
                     verticalalignment='top',
-                    transform=self.axes[slot_id - 1].transAxes
+                    #transform=self.axes[slot_id - 1].transAxes
                     )
             else:
                 x = (pd.to_datetime(df_session.time) - pd.to_datetime(df_session.time.iloc[0])).astype('timedelta64[s]').values
