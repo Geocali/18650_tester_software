@@ -10,7 +10,7 @@ import os
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.widgets import Slider, Button, RadioButtons
+# from matplotlib.widgets import Slider, Button, RadioButtons
 import matplotlib.pyplot as plt
 
 import tester
@@ -18,9 +18,11 @@ import tester
 
 class TesterOutline(tk.Tk):
 
-    def __init__(self):
+    def __init__(self, testing=False):
         # Inherit from tk.Tk
         super().__init__()
+
+        self.testing = testing
 
         # Title and size of the window
         self.title('18650 battery tester')
@@ -59,12 +61,13 @@ class TesterOutline(tk.Tk):
 
         # Add the graph to the graph tab
         self.fig = Figure()
-        graph = FigureCanvasTkAgg(self.fig,self.graph_tab)
-        graph.get_tk_widget().pack(side='top',fill='both',expand=True)
+        self.graph = FigureCanvasTkAgg(self.fig,self.graph_tab)
+        self.graph.get_tk_widget().pack(side='top',fill='both',expand=True)
         
         self.l, self.axes = plt.subplots(2, 2)
         self.create_plot()
-        self.update_plot(graph)
+        if not self.testing:
+            self.update_plot(self.graph)
 
     def create_plot(self):
         csv_file = 'output/measures.csv'
@@ -75,20 +78,56 @@ class TesterOutline(tk.Tk):
         for slot_id in range(1, 5):
             self.axes.append(self.fig.add_subplot(2, 2, slot_id))
             x = [0]
-            y = [3.5]
+            y = [0]
             curve, = self.axes[slot_id - 1].plot(x, y)
 
     def update_plot(self, graph):
 
         df_measures = tester.main_function()
+        self.df_measures = df_measures
         for slot_id in range(1, 5):
             df_values = df_measures[df_measures.slot_id == slot_id]
             self.axes[slot_id - 1].clear()
-            if df_values.iloc[-1].testing == 1:
-                x = (pd.to_datetime(df_values.time) - pd.to_datetime(df_values.time.iloc[0])).astype('timedelta64[s]').values[1:]
-                y = df_values.voltage.values[1:]
+            df_session = df_values[df_values.testing_session == df_values.testing_session.max()]
+
+            if (
+                df_session.shape[0] < 5
+                and np.all(df_session.testing.values == True)
+            ):
+                # starting test
+                x = (pd.to_datetime(df_session.time) - pd.to_datetime(df_session.time.iloc[0])).astype('timedelta64[s]').values
+                y = df_session.voltage.values
                 curve, = self.axes[slot_id - 1].plot(x, y)
-            else:
+                if df_values.iloc[-2].testing == 0:
+                    left = 0.2
+                    bottom = 0.5
+                    self.axes[slot_id - 1].text(
+                        left, 
+                        bottom, 
+                        "A charged battery is \ninserted, starting test",
+                        horizontalalignment='left',
+                        verticalalignment='top',
+                        transform=self.axes[slot_id - 1].transAxes
+                        )
+            elif (
+                df_session.testing.values[-1] == False
+                and df_session.testing.values[0] == True
+                and df_session.voltage.values[-1] < 2.5
+            ):
+                # test interrupted
+                left = 0.2
+                bottom = 0.5
+                self.axes[slot_id - 1].text(
+                    left, 
+                    bottom, 
+                    'Test interrupted \nWaiting for battery',
+                    horizontalalignment='left',
+                    verticalalignment='top',
+                    transform=self.axes[slot_id - 1].transAxes
+                    )
+
+            elif df_values.voltage.values[-1] <= 0.5:
+                # no battery
                 left = 0.2
                 bottom = 0.5
                 self.axes[slot_id - 1].text(
@@ -99,11 +138,43 @@ class TesterOutline(tk.Tk):
                     verticalalignment='top',
                     transform=self.axes[slot_id - 1].transAxes
                     )
+            elif np.all(df_session.testing.values == False):
+                # inserted battery not charged
+                left = 0.2
+                bottom = 0.5
+                self.axes[slot_id - 1].text(
+                    left, 
+                    bottom, 
+                    'The inserted battery is \nnot fully charged \ntest not starting',
+                    horizontalalignment='left',
+                    verticalalignment='top',
+                    transform=self.axes[slot_id - 1].transAxes
+                    )
+            elif (
+                df_session.testing.values[-1] == False
+                and df_session.testing.values[0] == True
+                and df_session[df_session.testing == True].voltage.values.min() > 2.5
+            ):
+                left = 0.2
+                bottom = 0.5
+                self.axes[slot_id - 1].text(
+                    left, 
+                    bottom, 
+                    'The test is completed! \nCapacity: ' + str(round(df_session.spent_mah.max(), 3)),
+                    horizontalalignment='left',
+                    verticalalignment='top',
+                    transform=self.axes[slot_id - 1].transAxes
+                    )
+            else:
+                x = (pd.to_datetime(df_session.time) - pd.to_datetime(df_session.time.iloc[0])).astype('timedelta64[s]').values
+                y = df_session.voltage.values
+                curve, = self.axes[slot_id - 1].plot(x, y)
 
         graph.draw()
         graph.flush_events() # flush the GUI events
-        # call this function again in the future
-        self.after(10000, self.update_plot(graph))
+        if not self.testing:
+            # call this function again in the future
+            self.after(10000, self.update_plot(graph))
         
 
     def quit(self):
