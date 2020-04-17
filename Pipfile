@@ -9,15 +9,12 @@ verify_ssl = true
 adafruit-circuitpython-busdevice = "*"
 adafruit-circuitpython-mcp3xxx = "*"
 pandas = "*"
-ptvsd = "*"
-plotly = "*"
 pytest = "*"
 numpy = "*"
 matplotlib = "*"
 Adafruit-Blinka = "*"
 "RPi.GPIO" = "*"
-Flask = "*"
-Flask-Cors = "*"
+dill = "*"
 
 [requires]
 python_version = "3.6"
