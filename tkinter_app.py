@@ -90,85 +90,56 @@ class TesterOutline(tk.Tk):
             self.axes[slot_id - 1].clear()
             df_session = df_values[df_values.testing_session == df_values.testing_session.max()]
 
-            if (
-                df_session.shape[0] < 5
-                and np.all(df_session.testing.values == True)
-            ):
-                # starting test
+            def draw_curve(df_session, slot_id):
                 x = (pd.to_datetime(df_session.time) - pd.to_datetime(df_session.time.iloc[0])).astype('timedelta64[s]').values
                 y = df_session.voltage.values
-                curve, = self.axes[slot_id - 1].plot(x, y)
-                if df_values.iloc[-2].testing == 0:
-                    left = 0.2
-                    bottom = 0.5
-                    self.axes[slot_id - 1].text(
-                        left, 
-                        bottom, 
-                        "A charged battery is \ninserted, starting test",
-                        horizontalalignment='left',
-                        verticalalignment='top',
-                        #transform=self.axes[slot_id - 1].transAxes
-                        )
-            elif (
+                self.axes[slot_id - 1].plot(x, y)
+
+            def write_text(text):
+                left = 0.2
+                bottom = 0.5
+                self.axes[slot_id - 1].text(
+                    left, 
+                    bottom, 
+                    text,
+                    horizontalalignment='left',
+                    verticalalignment='top',
+                    )
+
+            # calculate conditions to see in what case we are
+            starting_test = (
+                df_session.shape[0] < 5
+                and np.all(df_session.testing.values == True)
+                )
+            interrupted_test = (
                 df_session.testing.values[-1] == False
                 and df_session.testing.values[0] == True
                 and df_session.voltage.values[-1] < 2.5
-            ):
-                # test interrupted
-                left = 0.2
-                bottom = 0.5
-                self.axes[slot_id - 1].text(
-                    left, 
-                    bottom, 
-                    'Test interrupted \nWaiting for battery',
-                    horizontalalignment='left',
-                    verticalalignment='top',
-                    #transform=self.axes[slot_id - 1].transAxes
-                    )
-
-            elif df_values.voltage.values[-1] <= 0.5:
-                # no battery
-                left = 0.2
-                bottom = 0.5
-                self.axes[slot_id - 1].text(
-                    left, 
-                    bottom, 
-                    'Waiting for battery',
-                    horizontalalignment='left',
-                    verticalalignment='top',
-                    #transform=self.axes[slot_id - 1].transAxes
-                    )
-            elif np.all(df_session.testing.values == False):
-                # inserted battery not charged
-                left = 0.2
-                bottom = 0.5
-                self.axes[slot_id - 1].text(
-                    left, 
-                    bottom, 
-                    'The inserted battery is \nnot fully charged \ntest not starting',
-                    horizontalalignment='left',
-                    verticalalignment='top',
-                    #transform=self.axes[slot_id - 1].transAxes
-                    )
-            elif (
+            )
+            waiting_battery = df_values.voltage.values[-1] <= 0.5
+            inserted_discharged_battery = np.all(df_session.testing.values == False)
+            finished_test = (
                 df_session.testing.values[-1] == False
                 and df_session.testing.values[0] == True
                 and df_session[df_session.testing == True].voltage.values.min() > 2.5
-            ):
-                left = 0.2
-                bottom = 0.5
-                self.axes[slot_id - 1].text(
-                    left, 
-                    bottom, 
-                    'The test is completed! \nCapacity: ' + str(round(df_session.spent_mah.max(), 3)),
-                    horizontalalignment='left',
-                    verticalalignment='top',
-                    #transform=self.axes[slot_id - 1].transAxes
-                    )
+            )
+
+            if starting_test:
+                draw_curve(df_session, slot_id)
+                if df_values.iloc[-2].testing == 0:
+                    write_text("A charged battery is \ninserted, starting test")
+            elif interrupted_test:
+                write_text('Test interrupted \nWaiting for battery')
+            elif waiting_battery:
+                write_text('Waiting for battery')
+            elif inserted_discharged_battery:
+                write_text('The inserted battery is \nnot fully charged \ntest not starting')
+            elif finished_test:
+                text = 'The test is completed! \nCapacity: ' + str(round(df_session.spent_mah.max(), 3))
+                write_text(text)
             else:
-                x = (pd.to_datetime(df_session.time) - pd.to_datetime(df_session.time.iloc[0])).astype('timedelta64[s]').values
-                y = df_session.voltage.values
-                curve, = self.axes[slot_id - 1].plot(x, y)
+                draw_curve(df_session, slot_id)
+                
 
         graph.draw()
         graph.flush_events() # flush the GUI events
