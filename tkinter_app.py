@@ -138,6 +138,8 @@ class TesterOutline(tk.Tk):
                 text = 'The test is completed! \nCapacity: ' + str(round(df_session.spent_mah.max(), 3))
                 write_text(text)
             else:
+                text = str(round(df_session.spent_mah.max(), 3)) + "mAh"
+                write_text(text)
                 draw_curve(df_session, slot_id)
                 
 

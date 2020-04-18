@@ -65,16 +65,18 @@ class TestClass():
         self.tester_gui.update_plot(self.tester_gui.graph)
         assert len(self.tester_gui.axes[0].texts) == 1
         assert self.tester_gui.axes[0].texts[0]._text == "Waiting for battery"
+        assert self.tester_gui.axes[1].texts[0]._text == "Waiting for battery"
         # second measure, with battery
         self.tester_gui.update_plot(self.tester_gui.graph)
         assert len(self.tester_gui.axes[0].texts) == 1
         assert self.tester_gui.axes[0].texts[0]._text == "A charged battery is \ninserted, starting test"
         assert len(self.tester_gui.axes[0].lines[0]._path.vertices) == 1
         assert self.tester_gui.axes[0].lines[0]._path.vertices[0][1]== 4.2
+        assert self.tester_gui.axes[1].texts[0]._text == "Waiting for battery"
         # third measure, with battery
         self.tester_gui.update_plot(self.tester_gui.graph)
         assert np.array_equal(self.tester_gui.axes[0].lines[0]._path.vertices[:,1], [4.2, 4.1])
-
+        assert self.tester_gui.axes[1].texts[0]._text == "Waiting for battery"
 
     def test_a_discharged_battery_is_inserted_the_test_is_not_starting(self):
         def read_voltage(slot_id, i):
