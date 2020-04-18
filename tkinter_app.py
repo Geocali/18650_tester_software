@@ -67,7 +67,7 @@ class TesterOutline(tk.Tk):
         self.l, self.axes = plt.subplots(2, 2)
         self.create_plot()
         if not self.testing:
-            self.update_plot(self.graph)
+            self.update_plot()
 
     def create_plot(self):
         csv_file = 'output/measures.csv'
@@ -81,7 +81,7 @@ class TesterOutline(tk.Tk):
             y = [0]
             curve, = self.axes[slot_id - 1].plot(x, y)
 
-    def update_plot(self, graph):
+    def update_plot(self):
 
         df_measures = tester.main_function()
         self.df_measures = df_measures
@@ -93,9 +93,21 @@ class TesterOutline(tk.Tk):
             def draw_curve(df_session, slot_id):
                 x = (pd.to_datetime(df_session.time) - pd.to_datetime(df_session.time.iloc[0])).astype('timedelta64[s]').values
                 y = df_session.voltage.values
+                
+                text = str(round(df_session.spent_mah.max(), 1)) + "mAh"
+                left = x[-1] / 2
+                bottom = 4
+                self.axes[slot_id - 1].text(
+                    left, 
+                    bottom, 
+                    text,
+                    horizontalalignment='left',
+                    verticalalignment='top',
+                    )
+                
                 self.axes[slot_id - 1].plot(x, y)
 
-            def write_text(text):
+            def write_text(text, slot_id):
                 left = 0.2
                 bottom = 0.5
                 self.axes[slot_id - 1].text(
@@ -107,16 +119,7 @@ class TesterOutline(tk.Tk):
                     )
 
             # calculate conditions to see in what case we are
-            starting_test = (
-                df_session.shape[0] < 5
-                and np.all(df_session.testing.values == True)
-                )
-            interrupted_test = (
-                df_session.testing.values[-1] == False
-                and df_session.testing.values[0] == True
-                and df_session.voltage.values[-1] < 2.5
-            )
-            waiting_battery = df_values.voltage.values[-1] <= 0.5
+            waiting_battery = df_values.voltage.values[-1] <= 2
             inserted_discharged_battery = np.all(df_session.testing.values == False)
             finished_test = (
                 df_session.testing.values[-1] == False
@@ -124,30 +127,22 @@ class TesterOutline(tk.Tk):
                 and df_session[df_session.testing == True].voltage.values.min() > 2.5
             )
 
-            if starting_test:
-                draw_curve(df_session, slot_id)
-                if df_values.iloc[-2].testing == 0:
-                    write_text("A charged battery is \ninserted, starting test")
-            elif interrupted_test:
-                write_text('Test interrupted \nWaiting for battery')
-            elif waiting_battery:
-                write_text('Waiting for battery')
+            if waiting_battery:
+                write_text('Waiting for battery', slot_id)
             elif inserted_discharged_battery:
-                write_text('The inserted battery is \nnot fully charged \ntest not starting')
+                write_text('The inserted battery is \nnot fully charged \ntest not starting', slot_id)
             elif finished_test:
-                text = 'The test is completed! \nCapacity: ' + str(round(df_session.spent_mah.max(), 3))
-                write_text(text)
+                text = 'The test is completed! \nCapacity: ' + str(round(df_session.spent_mah.max(), 1))
+                write_text(text, slot_id)
             else:
-                text = str(round(df_session.spent_mah.max(), 3)) + "mAh"
-                write_text(text)
                 draw_curve(df_session, slot_id)
                 
 
-        graph.draw()
-        graph.flush_events() # flush the GUI events
+        self.graph.draw()
+        self.graph.flush_events() # flush the GUI events
         if not self.testing:
             # call this function again in the future
-            self.after(10000, self.update_plot(graph))
+            self.after(1000, self.update_plot)
         
 
     def quit(self):
