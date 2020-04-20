@@ -1,6 +1,7 @@
 pandas
 pytest
 pytest-cov
+python-coveralls
 numpy
 matplotlib
 dill
