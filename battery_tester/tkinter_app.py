@@ -131,7 +131,7 @@ class TesterOutline(tk.Tk):
             elif inserted_discharged_battery:
                 write_text('The inserted battery is \nnot fully charged \ntest not starting', slot_id)
             elif finished_test:
-                text = 'The test is completed! \nCapacity: ' + str(round(df_session.spent_mah.max(), 1))
+                text = 'The test is completed! \nCapacity: ' + str(round(df_session.spent_mah.max(), 1)) + "mAh"
                 write_text(text, slot_id)
             else:
                 draw_curve(df_session, slot_id)

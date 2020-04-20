@@ -5,6 +5,7 @@ install:
 services:
     - xvfb
 script:
+    - pip install coverage==4.5.4
     - pytest --cov=battery_tester tests/
 after_success:
     - coveralls
