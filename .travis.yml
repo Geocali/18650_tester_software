@@ -7,4 +7,4 @@ services:
 script:
     - pytest
 after_success:
-    - coveralls
+    - coveralls --base_dir .
