@@ -114,7 +114,7 @@ python3 battery_tester/tkinter_app.py
 
 Create a virtual environment:
 ```
-pipenv install
+pipenv install - requirement_dev.txt
 ```
 
 Then
@@ -122,4 +122,4 @@ Then
 pipenv shell
 ```
 
-Then, to run the tests, install pytest, and run the command ```pytest```
+Then, to run the tests, run the command ```pytest```
