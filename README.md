@@ -1,8 +1,14 @@
+
+![build](https://img.shields.io/travis/com/Geocali/18650_tester "Logo Title Text 1")
+[![Coverage Status](https://coveralls.io/repos/github/Geocali/18650_tester/badge.svg?branch=master)](https://coveralls.io/github/Geocali/18650_tester?branch=master)
+
 # Raspberry -based, 4-slots 18650 battery tester
 
-This is an open source lithium-ion 18650 cells tester that discharges 4 batteries into 4 resistors, records the current flowing each second, and deduces the total capacity of the cell.
+This is an open source lithium-ion 18650 cells tester that discharges 4 batteries into 4 resistors, regularly records the current flowing, and deduces the total capacity of the cell.
 
-Just put the charged cell in a slot, and the test starts automatically if the cell is charged. You can then follow the test on curves updated automatically in a web page.
+It is quit handy if you have old laptop batteries that you want to test in order to create your own battery packs for a very cheap price.
+
+Just put the charged cell in a slot, and the test starts automatically if the cell is charged. You can then follow the test on real-time curves.
 
 At the end of the test, a csv file is created with the recorded voltages and capacity.
 
@@ -11,8 +17,18 @@ When one cell is tested, you can replace it independently of the others.
 The advantages of this projects versus a commercial tester like the iMax B6 are:
 - all slots are totally independent
 - you can see the precise behaviour of the cell
+- you can calculate your own metrics on each cell
 - you can easily create statistics on the tested cells from the saved csv files
-- you can expend it to manage more cells
+- you can extend it to manage more cells
+
+From a programmer point of view, the project contains those following interesting points:
+- how to mock a Raspberry with an SPI device (here an MCP3008 ADC) in order to easily create unit tests
+- how to create unit tests for a Tkinter GUI
+
+Planned improvements:
+- use a constant discharge current
+- record the initial voltage drop when the battery is put under load
+- add an estimated remaining time during test
 
 # Construction
 
@@ -81,26 +97,18 @@ pip3 install -f requirements.txt
 
 # Run the program
 
-## Start the script that manages the testing of the batteries
+## Start the GUI that manages the testing of the batteries
 ```
-python3 tester.py
+python3 tkinter_app.py
 ```
 
-## Start the Flask API
-```
-python3 app.py
-```
 
 # Use it
 
 - First, charge your cells, for example with TP4056 cards.
 - Start the raspberry and run the program
 - Put the cells in the slots
-- Check the curves at http://(raspberryip):8080 or http://localhost:8080 if you work directly on your raspberry
-- When a cell is tested, the curve is going out of the blue area
-- Replace it with a new cell (wait for 10s before putting the new one)
-
-![curve detail](docs/curve_detail.jpg)
+- Once the test of a cell is finished, replace it with a new cell (wait for 10s before putting the new one)
 
 
 # Contributing

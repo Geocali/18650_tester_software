@@ -1,5 +1,6 @@
 pandas
 pytest
+pytest-cov
 numpy
 matplotlib
 dill

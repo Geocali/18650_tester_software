@@ -62,19 +62,19 @@ class TestClass():
 
         assert np.array_equal(self.tester_gui.axes[0].lines[0]._path.vertices, [[0, 0]])
         # first measure, without battery
-        self.tester_gui.update_plot(self.tester_gui.graph)
+        self.tester_gui.update_plot()
         assert len(self.tester_gui.axes[0].texts) == 1
         assert self.tester_gui.axes[0].texts[0]._text == "Waiting for battery"
         assert self.tester_gui.axes[1].texts[0]._text == "Waiting for battery"
         # second measure, with battery
-        self.tester_gui.update_plot(self.tester_gui.graph)
+        self.tester_gui.update_plot()
         assert len(self.tester_gui.axes[0].texts) == 1
-        assert self.tester_gui.axes[0].texts[0]._text == "A charged battery is \ninserted, starting test"
+        assert "mAh" in self.tester_gui.axes[0].texts[0]._text
         assert len(self.tester_gui.axes[0].lines[0]._path.vertices) == 1
         assert self.tester_gui.axes[0].lines[0]._path.vertices[0][1]== 4.2
         assert self.tester_gui.axes[1].texts[0]._text == "Waiting for battery"
         # third measure, with battery
-        self.tester_gui.update_plot(self.tester_gui.graph)
+        self.tester_gui.update_plot()
         assert np.array_equal(self.tester_gui.axes[0].lines[0]._path.vertices[:,1], [4.2, 4.1])
         assert self.tester_gui.axes[1].texts[0]._text == "Waiting for battery"
 
@@ -94,14 +94,14 @@ class TestClass():
             dill.dump(read_voltage, file)
 
         # first measure, without battery
-        self.tester_gui.update_plot(self.tester_gui.graph)
+        self.tester_gui.update_plot()
         assert len(self.tester_gui.axes[0].texts) == 1
         assert self.tester_gui.axes[0].texts[0]._text == "Waiting for battery"
         # second measure, with battery
-        self.tester_gui.update_plot(self.tester_gui.graph)
+        self.tester_gui.update_plot()
         assert len(self.tester_gui.axes[0].texts) == 1
         assert self.tester_gui.axes[0].texts[0]._text == "The inserted battery is \nnot fully charged \ntest not starting"
-        self.tester_gui.update_plot(self.tester_gui.graph)
+        self.tester_gui.update_plot()
         assert self.tester_gui.axes[0].texts[0]._text == "The inserted battery is \nnot fully charged \ntest not starting"
 
     
@@ -123,20 +123,20 @@ class TestClass():
             dill.dump(read_voltage, file)
 
         # first measure, without battery
-        self.tester_gui.update_plot(self.tester_gui.graph)
+        self.tester_gui.update_plot()
         assert len(self.tester_gui.axes[0].texts) == 1
         assert self.tester_gui.axes[0].texts[0]._text == "Waiting for battery"
         # second measure, with battery
-        self.tester_gui.update_plot(self.tester_gui.graph)
+        self.tester_gui.update_plot()
         assert len(self.tester_gui.axes[0].texts) == 1
-        assert self.tester_gui.axes[0].texts[0]._text == "A charged battery is \ninserted, starting test"
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        assert self.tester_gui.axes[0].texts[0]._text == "Test interrupted \nWaiting for battery"
+        assert "mAh" in self.tester_gui.axes[0].texts[0]._text
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        assert self.tester_gui.axes[0].texts[0]._text == "Waiting for battery"
 
     
     def test_a_charged_battery_is_inserted_after_interrupted_test(self):
@@ -159,17 +159,17 @@ class TestClass():
             dill.dump(read_voltage, file)
 
         # first measure, without battery
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        assert self.tester_gui.axes[0].texts[0]._text == "A charged battery is \ninserted, starting test"
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        assert "mAh" in self.tester_gui.axes[0].texts[0]._text
 
     def test_an_empty_battery_is_inserted_after_interrupted_test(self):
         def read_voltage(slot_id, i):
@@ -191,16 +191,16 @@ class TestClass():
             dill.dump(read_voltage, file)
 
         # first measure, without battery
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
         assert self.tester_gui.axes[0].texts[0]._text == "The inserted battery is \nnot fully charged \ntest not starting"
 
 
@@ -220,11 +220,11 @@ class TestClass():
             dill.dump(read_voltage, file)
 
         # first measure, without battery
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
-        self.tester_gui.update_plot(self.tester_gui.graph)
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
+        self.tester_gui.update_plot()
         assert "The test is completed!" in self.tester_gui.axes[0].texts[0]._text
 
     def test_a_test_is_completed_another_test_begins(self):
@@ -244,7 +244,7 @@ class TestClass():
 
         # first measure, without battery
         for i in range(50):
-            self.tester_gui.update_plot(self.tester_gui.graph)
+            self.tester_gui.update_plot()
 
         # assert "The test is completed!" in self.tester_gui.axes[0].texts[0]._text
 
