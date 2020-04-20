@@ -49,8 +49,8 @@ Planned improvements:
 
 Example of construction
 
-![construction example](docs/constructed_tester.jpg)
-<img src="docs/constructed_tester.jpg" width="20" />
+<!-- ![construction example](docs/constructed_tester.jpg) -->
+<img src="docs/constructed_tester.jpg" width="200" />
 
 # Set up your Raspberry
 
