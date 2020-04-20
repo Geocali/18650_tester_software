@@ -1,6 +1,6 @@
 
-![build](https://img.shields.io/travis/com/Geocali/18650_tester "Logo Title Text 1")
-[![Coverage Status](https://coveralls.io/repos/github/Geocali/18650_tester/badge.svg?branch=master)](https://coveralls.io/github/Geocali/18650_tester?branch=master)
+![build](https://img.shields.io/travis/com/Geocali/18650_tester "Tests success")
+[![Coverage Status](https://coveralls.io/repos/github/Geocali/18650_tester/badge.svg?branch=master)](https://coveralls.io/github/Geocali/18650_tester?branch=master&service=github)
 
 # Raspberry -based, 4-slots 18650 battery tester
 
