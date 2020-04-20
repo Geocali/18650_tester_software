@@ -1,5 +1,5 @@
 
-![build](https://img.shields.io/travis/com/Geocali/18650_tester "Tests success")
+![](https://api.travis-ci.com/Geocali/18650_tester.svg?branch=master&status=passed "Tests success")
 [![Coverage Status](https://coveralls.io/repos/github/Geocali/18650_tester/badge.svg?branch=master)](https://coveralls.io/github/Geocali/18650_tester?branch=master&service=github)
 
 # Raspberry -based, 4-slots 18650 battery tester
@@ -13,6 +13,8 @@ Just put the charged cell in a slot, and the test starts automatically if the ce
 At the end of the test, a csv file is created with the recorded voltages and capacity.
 
 When one cell is tested, you can replace it independently of the others.
+
+![Testing batteries](docs/example.gif)
 
 The advantages of this projects versus a commercial tester like the iMax B6 are:
 - all slots are totally independent
@@ -48,10 +50,7 @@ Planned improvements:
 Example of construction
 
 ![construction example](docs/constructed_tester.jpg)
-
-Test curves
-
-![test curves](docs/test_curves.jpg)
+<img src="docs/constructed_tester.jpg" width="20" />
 
 # Set up your Raspberry
 
@@ -99,7 +98,7 @@ pip3 install -f requirements.txt
 
 ## Start the GUI that manages the testing of the batteries
 ```
-python3 tkinter_app.py
+python3 battery_tester/tkinter_app.py
 ```
 
 
