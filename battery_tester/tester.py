@@ -15,7 +15,7 @@ try:
     from adafruit_mcp3xxx.analog_in import AnalogIn
 except:
     # we are not on a raspberry, but we still can do some tests
-    from rpi_mock import *
+    from battery_tester.rpi_mock import *
 
 
 # ==== global parameters ====

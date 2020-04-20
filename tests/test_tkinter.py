@@ -1,4 +1,4 @@
-import tkinter_app
+from battery_tester import tkinter_app
 import tkinter
 import pytest
 import dill

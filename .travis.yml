@@ -5,6 +5,6 @@ install:
 services:
     - xvfb
 script:
-    - pytest
+    - pytest --cov=battery_tester tests/
 after_success:
-    - coveralls --base_dir .
+    - coveralls

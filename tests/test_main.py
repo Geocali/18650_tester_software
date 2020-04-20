@@ -1,4 +1,4 @@
-import tester
+from battery_tester import tester
 import pytest
 import json
 import dill

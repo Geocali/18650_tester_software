@@ -1,4 +1,4 @@
-from rpi_mock import *
+from battery_tester.rpi_mock import *
 import pytest
 
 import json
