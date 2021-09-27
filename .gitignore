@@ -1,3 +1,6 @@
 creds.py
 /.idea
 /.vscode
+output/
+read_voltage.pkl
+test_state.json

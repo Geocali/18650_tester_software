@@ -61,6 +61,7 @@ Example of construction
 ```
 sudo pip3 install --upgrade setuptools
 sudo apt-get install -y python-smbus
+sudo apt-get install -y python3-tk
 sudo apt-get install -y i2c-tools
 ```
 
